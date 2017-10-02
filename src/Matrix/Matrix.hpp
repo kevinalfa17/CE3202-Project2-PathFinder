@@ -11,6 +11,10 @@
 #include <cstddef>
 #include <cstring>
 #include <cassert>
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include "../config.h"
+#include "MatrixException.hpp"
 
 
 
@@ -31,6 +35,9 @@ namespace anpi
     /// Number of columns
     size_t _cols;
 
+    //Deallocate memory
+    void deallocate();
+
   public:
     /**
      * Type to make explicit a desired unitialized matrix
@@ -49,17 +56,13 @@ namespace anpi
      *
      * Call as Matrix<T> m(5,5,anpi::Matrix<T>::DoNotInitialize)
      */
-    explicit Matrix(const size_t rows,
-		    const size_t cols,
-		    const InitializationType);
+    explicit Matrix(const size_t rows, const size_t cols, const InitializationType);
 
     /**
      * Construct a matrix rows x cols and initialize all
      * elements with the given value     
      */
-    explicit Matrix(const size_t rows,
-		    const size_t cols,
-		    const T initVal=T());
+    explicit Matrix(const size_t rows,const size_t cols,const T initVal=T());
 
     /**
      * Construct a matrix rows x cols and initialize all
@@ -67,9 +70,7 @@ namespace anpi
      *
      * Note that the content in the given block is copied
      */
-    explicit Matrix(const size_t rows,
-		    const size_t cols,
-		    const T *const initMem);
+    explicit Matrix(const size_t rows,const size_t cols,const T *const initMem);
 
     /**
      * Constructs a matrix from a std::initializer_list
