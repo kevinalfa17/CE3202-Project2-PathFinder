@@ -185,9 +185,14 @@ namespace anpi
     inline size_t cols() const { return _cols; }
 
     /**
+     * Number of extra columns
+     */
+    inline size_t ecols() const { return _dcols-_cols; }
+
+    /**
      * Number of dominant columns
      */
-    inline size_t ecols() const { return _dcols; }
+    inline size_t dcols() const { return _dcols; }
 
     /**
      * Total number of entries (rows x cols)
