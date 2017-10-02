@@ -14,13 +14,36 @@ namespace anpi
   // ------------------------
 
   template<typename T>
-  Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0) {}
-
-  //No initialization
+  Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0),_dcols(0) {}
+  
+//Initialization with type
+#if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE) 
+  //DoNotInitialize and Padded possible
   template<typename T>
-  Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType): _data(0),_rows(0),_cols(0) {
+  Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType): _data(0),_rows(0),_cols(0),_dcols(0) {
+	  switch(InitializationType){
+	  case DoNotInitialize:
+		  if(() 
+		  if(((sizeof(T)*c)/16) != 1 || (r*c)%4 != 0){
+			  throw PaddingWarningException();
+		  }
+		  
+		  allocate(r,c);
+		  break;
+	  case Padded:
+		  padded_allocate(r,c);
+		  break;
+	  }
+	  
+  }
+#else
+  //Only DoNotInitialize is possible
+  template<typename T>
+  Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType): _data(0),_rows(0),_cols(0),_dcols(0) {
     allocate(r,c);
   }
+#endif
+  
   
   //Initialization with initial value
   template<typename T>
@@ -58,10 +81,11 @@ namespace anpi
   
   //Transfer constructor 
   template<typename T>
-  Matrix<T>::Matrix(Matrix<T>&& other): _data(other._data),_rows(other._rows),_cols(other._cols) {
+  Matrix<T>::Matrix(Matrix<T>&& other): _data(other._data),_rows(other._rows),_cols(other._cols), _dcols(other._dcols) {
     other._data=0; // remove references to the data in other
     other._rows=0; 
     other._cols=0;
+    other._dcols=0;
   }
   
   //Relase all memory
@@ -70,58 +94,57 @@ namespace anpi
 	  deallocate();
 	  _data=0;
 	  _rows=0;
-	  _data=0;
-  }
-
-
-  template<typename T>
-  Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other) {
-	  allocate(other._rows,other._cols);
-	  fill(other.data());
-	  return *this;
-  }
-
-  // = Operator
-  template<typename T>
-  Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) {
-	  if (_data!=other._data) { // alias detection first
-		  deallocate();
-
-		  _data=other._data;
-		  _rows=other._rows;
-		  _cols=other._cols;
-
-		  other._data=0;
-		  other._rows=0;
-		  other._cols=0;
-	  }
-
-	  return *this;
+	  _cols=0;
+	  _dcols=0;
   }
   
+//Functions with InitilizationType Parameter
+#if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE) 
+  
+  //Initialization with initial value and initialization type
   template<typename T>
-  bool Matrix<T>::operator==(const Matrix<T>& other) const {
-    if (&other==this) return true; // alias detection
-
-    // same size of matrices?
-    if ((other._rows != _rows) ||
-	(other._cols != _cols)) return false;
-
-    // check the content with pointers
-    return (memcmp(_data,other._data,entries()*sizeof(T))==0);
+  Matrix<T>::Matrix(const size_t r, const size_t c, const T initVal, const InitializationType):Matrix(r,c,InitializationType) {
+	  
+	  switch(InitializationType){
+	  case DoNotInitialize:
+		  fill(initVal);
+		  break;
+	  case Padded:
+		  padded_fill(initVal);
+		  break;
+	  }  
   }
 
+  //Initialization with  given pointer
   template<typename T>
-  bool Matrix<T>::operator!=(const Matrix<T>& other) const {
-    if (&other==this) return false; // alias detection
-
-    // same size of matrices?
-    if ((other._rows != _rows) ||
-	(other._cols != _cols)) return true;
-
-    // check the content with pointers
-    return (memcmp(_data,other._data,entries()*sizeof(T))!=0);
+  Matrix<T>::Matrix(const size_t r,  const size_t c, const T *const initMem,const InitializationType): Matrix(r,c,InitializationType) {
+	  switch(InitializationType){
+	  case DoNotInitialize:
+		  fill(initMem);
+		  break;
+	  case Padded:
+		  padded_fill(initMem);
+		  break;
+	  }
   }
+ 
+  //Copy constructor (Deep copy)
+  template<typename T>
+  Matrix<T>::Matrix(const Matrix<T>& other, const InitializationType): Matrix(other._rows,other._cols,InitializationType) {
+	  
+	  switch(InitializationType){
+	  case DoNotInitialize:
+		  fill(other.data());
+		  break;
+	  case Padded:
+		  padded_fill(other.data());
+		  break;
+	  }
+  }
+  
+#endif
+
+ 
 
   template<typename T>
   void Matrix<T>::swap(Matrix<T>& other) {
@@ -144,6 +167,38 @@ namespace anpi
 
 		  _rows=r;
 		  _cols=c;
+		  _dcols=c;
+	  }
+  }
+  
+  void Matrix<T>::padded_allocate(const size_t r, const size_t c) {
+	  
+	  // Only reserve if the desired size is different to the current one
+	  if ( (r!=_rows) || (c!=_cols) ) {
+		  deallocate(); //Free aligned memory
+		  
+		  int res = (sizeof(T)*c)/16; //Aux variable to check padding required 
+		  int cols_per_row = 16/sizeof(T); //Max number of cols for T type
+				  
+		  if(res > 1){ //Extra column padding required
+			  _dcols = (c\cols_per_row)*cols_per_row+cols_per_row; //Pay attention that \ instead od / is used!		  
+		  }
+		  else if(res < 1){ //Minimum colums 16/sizeof(T)required. Ex: 4 in float or 2 in double
+			  _dcols = cols_per_row;
+		  }
+		  else{ //No padding required (cols are  multiple of 16)
+			  _dcols = c;  
+		  }
+		  
+		  const size_t total = r*_dcols; // Total number of required entries
+
+		  
+		  T* alignData = (T*) _mm_malloc (total * sizeof(T), 16);//Align total*mult T spaces to 16-byte for SSE
+
+		  _data = (total > 0) ? alignData : 0;
+		  _rows=r;
+		  _cols=c;
+
 	  }
   }
 #else //Standar allocation
@@ -157,6 +212,7 @@ namespace anpi
 
 		  _rows=r;
 		  _cols=c;
+		  _dcols=c;
 	  }
   }
 #endif
@@ -210,6 +266,62 @@ namespace anpi
  		  *ptr = val;
  	  }
    }
+  
+  
+  //Float padded_fill
+   template<>
+   void Matrix<float>::padded_fill(const float val) {
+
+ 	  int SSELength = (_rows*_dcols)/4; //fill 4 values at the same time
+ 	  __m128 * dataSSE =  (__m128*) _data;
+
+ 	  for(int i = 0; i < SSELength; i++){
+ 		  dataSSE[i] = _mm_set1_ps(val); // dataSSE[i] = [val,val,val,val]
+ 	  }
+
+   }
+
+   //Double padded_fill
+   template<>
+   void Matrix<double>::padded_fill(const double val) {
+
+ 	  int SSELength = (_rows*_dcols)/2; //fill 2 values at the same time
+ 	  __m128d * dataSSE =  (__m128d*) _data;
+
+ 	  for(int i = 0; i < SSELength; i++){
+ 		  dataSSE[i] = _mm_set1_pd(val); // dataSSE[i] = [val,val]
+ 	  }
+
+   }
+
+   //int padded_fill
+   template<>
+   void Matrix<int>::padded_fill(const int val) {
+
+ 	  int SSELength = (_rows*_dcols)/2; //fill 4 values at the same time
+ 	  __m128i * dataSSE =  (__m128i*) _data;
+
+ 	  for(int i = 0; i < SSELength; i++){
+ 		  dataSSE[i] = _mm_set1_epi32(val); // dataSSE[i] = [val,val,val,val]
+ 	  }
+
+   }
+
+   //Type is different to float, int or double, then do the standard fill
+   template<typename T>
+    void Matrix<T>::padded_fill(const T val) {
+  	  T* end = _data + (_rows*_dcols);
+  	  for (T* ptr = _data;ptr!=end;++ptr) {
+  		  *ptr = val;
+  	  }
+    }
+   
+   //Memcpy padded
+   template<typename T>
+   void Matrix<T>::padded_fill(const T* mem) {
+     std::memcpy(_data,mem,sizeof(T)*_rows*_dcols);
+   }
+   
 #else //Standard fill
   
   template<typename T>
@@ -219,15 +331,70 @@ namespace anpi
 		  *ptr = val;
 	  }
   }
-#endif
+  
 
+#endif
+  
   template<typename T>
   void Matrix<T>::fill(const T* mem) {
     std::memcpy(_data,mem,sizeof(T)*_rows*_cols);
   }
+  
+  
+  //Assign and comparisson operators
+  template<typename T>
+   Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other) {
+ 	  allocate(other._rows,other._cols);
+ 	  fill(other.data());
+ 	  return *this;
+   }
 
-  // ARITHMETIC
+   // = Operator
+   template<typename T>
+   Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) {
+ 	  if (_data!=other._data) { // alias detection first
+ 		  deallocate();
 
+ 		  _data=other._data;
+ 		  _rows=other._rows;
+ 		  _cols=other._cols;
+ 		  _dcols=other._dcols;
+ 		  
+
+ 		  other._data=0;
+ 		  other._rows=0;
+ 		  other._cols=0;
+ 		  other._dcols=0;
+ 	  }
+
+ 	  return *this;
+   }
+   
+   template<typename T>
+   bool Matrix<T>::operator==(const Matrix<T>& other) const {
+     if (&other==this) return true; // alias detection
+
+     // same size of matrices?
+     if ((other._rows != _rows) ||
+ 	(other._cols != _cols)) return false;
+
+     // check the content with pointers
+     return (memcmp(_data,other._data,entries()*sizeof(T))==0);
+   }
+
+   template<typename T>
+   bool Matrix<T>::operator!=(const Matrix<T>& other) const {
+     if (&other==this) return false; // alias detection
+
+     // same size of matrices?
+     if ((other._rows != _rows) ||
+ 	(other._cols != _cols)) return true;
+
+     // check the content with pointers
+     return (memcmp(_data,other._data,entries()*sizeof(T))!=0);
+   }
+
+  // ARITHMETIC OPERATORS
   template<typename T>
   Matrix<T>& Matrix<T>::operator+=(const Matrix<T>& other) {
 

@@ -15,6 +15,8 @@
 #include <emmintrin.h>
 #include "../config.h"
 #include "MatrixException.hpp"
+#include "PaddingWarningException.hpp"
+
 
 
 
@@ -34,7 +36,8 @@ namespace anpi
     size_t _rows;
     /// Number of columns
     size_t _cols;
-
+    //Number of dominant columns
+    size_t _dcols;
     //Deallocate memory
     void deallocate();
 
@@ -43,7 +46,8 @@ namespace anpi
      * Type to make explicit a desired unitialized matrix
      */
     enum InitializationType {
-      DoNotInitialize
+      DoNotInitialize,
+	  Padded
     };
 
 
@@ -179,6 +183,11 @@ namespace anpi
      * Number of columns
      */
     inline size_t cols() const { return _cols; }
+
+    /**
+     * Number of dominant columns
+     */
+    inline size_t ecols() const { return _dcols; }
 
     /**
      * Total number of entries (rows x cols)
