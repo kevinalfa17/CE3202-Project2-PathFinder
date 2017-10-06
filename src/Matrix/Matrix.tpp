@@ -302,7 +302,7 @@ Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& other) {
 }
 
 
-
+//float addition
 template<>
 Matrix<float> operator+(const Matrix<float>& a,const Matrix<float>& b) {
 
@@ -325,7 +325,6 @@ Matrix<float> operator+(const Matrix<float>& a,const Matrix<float>& b) {
 	}
 	else{//Optimized float add
 		
-		std::cout <<"OptimizedFloat"<<std::endl;
 		Matrix<float> c;
 
 		if(a.cols() == a.dcols()){//Non-padded
@@ -351,7 +350,7 @@ Matrix<float> operator+(const Matrix<float>& a,const Matrix<float>& b) {
 
 	}
 }
-
+//double addition
 template<>
 Matrix<double> operator+(const Matrix<double>& a,const Matrix<double>& b) {
 
@@ -397,6 +396,7 @@ Matrix<double> operator+(const Matrix<double>& a,const Matrix<double>& b) {
 	}
 }
 
+//Int addition
 template<>
 Matrix<int> operator+(const Matrix<int>& a,const Matrix<int>& b) {
 
@@ -462,6 +462,149 @@ Matrix<T> operator+(const Matrix<T>& a,const Matrix<T>& b) {
 	return c;
 }
 
+
+//float substraction
+template<>
+Matrix<float> operator-(const Matrix<float>& a,const Matrix<float>& b) {
+
+	assert( (a.rows()==b.rows()) && (a.cols()==b.cols()) && (a.dcols()==b.dcols()) );
+
+	if((a.rows()*a.dcols())%4 != 0){ //Normal add
+		Matrix<float> c(a.rows(),a.cols(),Matrix<float>::DoNotInitialize);
+		float* cptr        = c.data();
+		float *const end   = cptr + a.entries();
+
+		const float* aptr = a.data();
+		const float* bptr = b.data();
+
+		for (;cptr!=end;) {
+			*cptr++ = *aptr++ + *bptr++;
+		}
+
+		return c;
+
+	}
+	else{//Optimized float sub
+		
+		Matrix<float> c;
+
+		if(a.cols() == a.dcols()){//Non-padded
+			c = Matrix<float>(a.rows(), a.cols(), Matrix<float>::DoNotInitialize);
+		}
+		else{//Padded
+			c = Matrix<float>(a.rows(), a.cols(), Matrix<float>::Padded);
+		}
+
+		int SSELength = (a.rows()*a.dcols())/4; //fill 4 values at the same time
+		
+		__m128 * aSSE =  (__m128*) a.data();
+		__m128 * bSSE =  (__m128*) b.data();
+		__m128 * cSSE =  (__m128*) c.data();
+
+		for(int i = 0; i < SSELength; i++){
+			//ci=ai-bi in SSE format
+			cSSE[i] = _mm_sub_ps(aSSE[i],bSSE[i]);; // dataSSE[i] = [a1-b1, a2-b2, a3-b3, a4-b4] in the first loop
+			
+		}
+		
+		return c;
+
+	}
+}
+
+//double substraction
+template<>
+Matrix<double> operator-(const Matrix<double>& a,const Matrix<double>& b) {
+
+	assert( (a.rows()==b.rows()) && (a.cols()==b.cols()) && (a.dcols()==b.dcols()) );
+
+	if((a.rows()*a.dcols())%2 != 0){ //Normal add
+		Matrix<double> c(a.rows(),a.cols(),Matrix<double>::DoNotInitialize);
+		double* cptr        = c.data();
+		double *const end   = cptr + a.entries();
+
+		const double* aptr = a.data();
+		const double* bptr = b.data();
+
+		for (;cptr!=end;) {
+			*cptr++ = *aptr++ + *bptr++;
+		}
+
+		return c;
+
+	}
+	else{//Optimized double sub
+		Matrix<double> c;
+
+		if(a.cols() == a.dcols()){//Non-padded
+			c = Matrix<double>(a.rows(), a.cols(), Matrix<double>::DoNotInitialize);
+		}
+		else{//Padded
+			c = Matrix<double>(a.rows(), a.cols(), Matrix<double>::Padded);
+		}
+
+		int SSELength = (a.rows()*a.dcols())/2; //fill 4 values at the same time
+		__m128d * aSSE =  (__m128d*) a.data();
+		__m128d * bSSE =  (__m128d*) b.data();
+		__m128d * cSSE =  (__m128d*) c.data();
+
+		for(int i = 0; i < SSELength; i++){
+			//ci=ai-bi in SSE format
+			cSSE[i] = _mm_sub_pd(aSSE[i],bSSE[i]);; // dataSSE[i] = [a1-b1, a2-b2] in the first loop
+
+		}
+
+		return c;
+	}
+}
+
+//int substraction
+template<>
+Matrix<int> operator-(const Matrix<int>& a,const Matrix<int>& b) {
+
+	assert( (a.rows()==b.rows()) && (a.cols()==b.cols()) && (a.dcols()==b.dcols()) );
+
+	if((a.rows()*a.dcols())%4 != 0){ //Normal add
+		Matrix<int> c(a.rows(),a.cols(),Matrix<int>::DoNotInitialize);
+		int* cptr        = c.data();
+		int *const end   = cptr + a.entries();
+
+		const int* aptr = a.data();
+		const int* bptr = b.data();
+
+		for (;cptr!=end;) {
+			*cptr++ = *aptr++ + *bptr++;
+		}
+
+		return c;
+
+	}
+	else{//Optimized int sub
+		Matrix<int> c;
+
+		if(a.cols() == a.dcols()){//Non-padded
+			c = Matrix<int>(a.rows(), a.cols(), Matrix<int>::DoNotInitialize);
+		}
+		else{//Padded
+			c = Matrix<int>(a.rows(), a.cols(), Matrix<int>::Padded);
+		}
+
+		int SSELength = (a.rows()*a.dcols())/4; //fill 4 values at the same time
+		__m128i * aSSE =  (__m128i*) a.data();
+		__m128i * bSSE =  (__m128i*) b.data();
+		__m128i * cSSE =  (__m128i*) c.data();
+
+		for(int i = 0; i < SSELength; i++){
+			//ci=ai-bi in SSE format
+			cSSE[i] = _mm_sub_epi32(aSSE[i],bSSE[i]);; // dataSSE[i] = [a1-b1, a2-b2, a3-b3, a4-b4] in the first loop
+
+		}
+
+		return c;
+	}
+}
+
+//Type is different to float, int or double, then do the standard substract
 template<class T>
 Matrix<T> operator-(const Matrix<T>& a,
 		const Matrix<T>& b) {

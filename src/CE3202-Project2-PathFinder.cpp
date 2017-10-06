@@ -76,7 +76,7 @@ int main() {
 	cout <<"ecols"<<M.ecols()<<endl;
 	Matrix<float> M2 = Matrix<float>(5, 5, float(5), Matrix<float>::Padded);
 
-	Matrix<float> M3 = M + M2;
+	Matrix<float> M3 = M2 - M;
 
 
 	printMatrix(M3);
