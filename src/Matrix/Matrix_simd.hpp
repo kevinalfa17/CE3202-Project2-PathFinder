@@ -160,22 +160,18 @@ namespace anpi
     void fill(const T* mem);
 
     /**
+     * Fill all elements of the matrix with the given memory block
+     *
+     * The user must ensure that the given memory block has enough elements
+     */
+    void standard_fill(const T val);
+
+    /**
      * Allocate memory for the given number of rows and cols
      */
     void padded_allocate(const size_t row,
     		const size_t col);
 
-    /**
-     * Fill all elements of the matrix with the given value
-     */
-    void padded_fill(const T val);
-
-    /**
-     * Fill all elements of the matrix with the given memory block
-     *
-     * The user must ensure that the given memory block has enough elements
-     */
-    void padded_fill(const T* mem);
 
     /**
      * Check if the matrix is empty (zero rows or columns)

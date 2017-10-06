@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017 
+ * Copyright (C) 2017
  * Área Académica de Ingeniería en Computadoras, ITCR, Costa Rica
  *
  * This file is part of the numerical analysis lecture CE3102 at TEC
@@ -13,6 +13,7 @@
 #include <cassert>
 #include <xmmintrin.h>
 #include <emmintrin.h>
+#include <iostream>
 #include "../config.h"
 #include "MatrixException.hpp"
 #include "PaddingWarningException.hpp"

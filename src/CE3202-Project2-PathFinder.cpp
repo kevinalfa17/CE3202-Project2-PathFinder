@@ -71,11 +71,15 @@ int main() {
 	}
 
 	//Matrix example
-	Matrix<float> M = Matrix<float>(3, 3, float(4), Matrix<float>::Padded);
+	Matrix<float> M = Matrix<float>(5, 5, float(4), Matrix<float>::Padded);
 	cout <<"dcols"<<M.dcols()<<endl;
 	cout <<"ecols"<<M.ecols()<<endl;
+	Matrix<float> M2 = Matrix<float>(5, 5, float(5), Matrix<float>::Padded);
 
-	printMatrix(M);
+	Matrix<float> M3 = M + M2;
+
+
+	printMatrix(M3);
 
 
 	return 0;
