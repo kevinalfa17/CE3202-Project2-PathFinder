@@ -7,16 +7,40 @@
 //============================================================================
 
 #include "config.h"
+#if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
+#include "Matrix/Matrix_simd.hpp"
+#else
+#include "Matrix/Matrix_simd.hpp"
+#endif
 #include <iostream>
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #endif
 
 using namespace std;
+using namespace anpi;
+
+
+
+
+/**
+ * @brief Print a matrix
+ * @param m: Matrix to print
+ */
+template <typename T>
+void printMatrix(anpi::Matrix<T> &m){
+	for(int i = 0; i < m.rows(); i++){
+		cout << "|\t";
+		for(int j = 0; j < m.cols(); j++)
+			cout << "[" << m[i][j] << "]\t";
+		cout << "|" <<endl;
+	}
+}
+
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 int main() {
-	cout << "!!!Hello World SIMD is active and available!!!" << endl; // prints !!!Hello World!!!
+	cout << "!!!Hello World SIMD is active and available!!!!" << endl; // prints !!!Hello World!!!
 
 	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
 	int length = 400;
@@ -45,6 +69,15 @@ int main() {
 	for(int i = 0;i<20;i++){
 		cout <<"Result["<<i<<"] = "<<pResult[i]<<endl;
 	}
+
+	//Matrix example
+	Matrix<float> M = Matrix<float>(3, 3, float(4), Matrix<float>::Padded);
+	cout <<"dcols"<<M.dcols()<<endl;
+	cout <<"ecols"<<M.ecols()<<endl;
+
+	printMatrix(M);
+
+
 	return 0;
 }
 #else
