@@ -1,2 +1,2 @@
-#define IS_SIMD_ACTIVE
+//#define IS_SIMD_ACTIVE
 #define IS_SIMD_AVAILABLE

@@ -7,12 +7,9 @@
 //============================================================================
 
 #include "config.h"
-#if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
-#include "Matrix/Matrix_simd.hpp"
-#else
-#include "Matrix/Matrix_simd.hpp"
-#endif
+#include "Matrix/Matrix.hpp"
 #include <iostream>
+
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #endif
@@ -87,6 +84,19 @@ int main() {
 #else
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+
+	//Non- SIMD Matrix test
+	Matrix<float> M = Matrix<float>(5, 5, float(4), Matrix<float>::Padded); //Padded ignored
+	cout <<"dcols"<<M.dcols()<<endl; //dcols = cols
+	cout <<"ecols"<<M.ecols()<<endl; //ecols = 0
+	Matrix<float> M2 = Matrix<float>(5, 5, float(5), Matrix<float>::Padded); //Padded ignored
+
+	Matrix<float> M3 = M2 - M;
+
+
+	printMatrix(M3);
+
+
 	return 0;
 }
 #endif

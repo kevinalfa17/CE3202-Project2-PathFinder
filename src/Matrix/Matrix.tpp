@@ -671,11 +671,11 @@ namespace anpi
 
 //Constructor
 template<typename T>
-Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0) {}
+Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0),_dcols(0) {}
 
 //DoNotInitialize
 template<typename T>
-Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType): _data(0),_rows(0),_cols(0) {
+Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType): _data(0),_rows(0),_cols(0),_dcols(0) {
 	allocate(r,c);
 }
 
@@ -719,6 +719,7 @@ Matrix<T>::Matrix(Matrix<T>&& other): _data(other._data),_rows(other._rows),_col
 	other._data=0; // remove references to the data in other
 	other._rows=0; 
 	other._cols=0;
+	other._dcols=0;
 }
 
 //Relase all memory
@@ -728,6 +729,7 @@ Matrix<T>::~Matrix() {
 	_data=0;
 	_rows=0;
 	_cols=0;
+	_dcols=0;
 }
 
 //Swap function
@@ -736,6 +738,7 @@ void Matrix<T>::swap(Matrix<T>& other) {
 	std::swap(_data,other._data);
 	std::swap(_rows,other._rows);
 	std::swap(_cols,other._cols);
+	std::swap(_dcols,other._dcols);
 }
 
 //Allocate memory
@@ -749,6 +752,7 @@ void Matrix<T>::allocate(const size_t r, const size_t c) {
 
 		_rows=r;
 		_cols=c;
+		_dcols=c;
 	}
 }
 
@@ -784,10 +788,12 @@ Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) {
 		_data=other._data;
 		_rows=other._rows;
 		_cols=other._cols;
+		_dcols=other._dcols;
 
 		other._data=0;
 		other._rows=0;
 		other._cols=0;
+		other._dcols=0;
 	}
 
 	return *this;
