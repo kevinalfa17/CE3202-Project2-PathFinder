@@ -75,6 +75,8 @@ int main() {
 
 	Matrix<float> M3 = M2 - M;
 
+	M3(4,4) = 7;
+
 
 	printMatrix(M3);
 

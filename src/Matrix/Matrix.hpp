@@ -128,12 +128,14 @@ namespace anpi
 
     /// Return reference to the element at the r row and c column
     T& operator()(const size_t row,const size_t col) {
-      return *(_data + (row*_dcols + col));
+    	assert(col<_cols && row<_rows);
+    	return *(_data + (row*_dcols + col));
     }
 
     /// Return const reference to the element at the r row and c column
     const T& operator()(const size_t row,const size_t col) const {
-      return *(_data + (row*_dcols + col));
+    	assert(col<_cols && row<_rows);
+    	return *(_data + (row*_dcols + col));
     }
 
     /**
