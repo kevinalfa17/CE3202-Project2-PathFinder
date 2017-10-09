@@ -235,7 +235,6 @@ Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) {
 		_cols=other._cols;
 		_dcols=other._dcols;
 
-
 		other._data=0;
 		other._rows=0;
 		other._cols=0;

@@ -8,7 +8,11 @@
 
 #include "config.h"
 #include "Matrix/Matrix.hpp"
+#include "NodePair.h"
+#include "IndexMap.h"
 #include <iostream>
+#include <boost/bimap.hpp>
+#include <boost/bimap/unordered_set_of.hpp>
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
@@ -16,6 +20,7 @@
 
 using namespace std;
 using namespace anpi;
+using namespace boost::bimaps;
 
 
 
@@ -33,6 +38,19 @@ void printMatrix(anpi::Matrix<T> &m){
 		cout << "|" <<endl;
 	}
 }
+
+/*template< class MapType >
+void print_map(const MapType & map)
+{
+	typedef typename MapType::const_iterator const_iterator;
+
+	for( const_iterator i = map.begin(), iend = map.end(); i != iend; ++i )
+	{
+		NodePair * pair = i->second;
+		cout << i->first << "-->";
+		pair->printPair();
+	}
+}*/
 
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
@@ -69,16 +87,21 @@ int main() {
 
 	//Matrix example
 	Matrix<float> M = Matrix<float>(5, 5, float(4), Matrix<float>::Padded);
-	cout <<"dcols"<<M.dcols()<<endl;
-	cout <<"ecols"<<M.ecols()<<endl;
+	cout <<"dcols "<<M.dcols()<<endl;
+	cout <<"ecols "<<M.ecols()<<endl;
 	Matrix<float> M2 = Matrix<float>(5, 5, float(5), Matrix<float>::Padded);
-
 	Matrix<float> M3 = M2 - M;
-
 	M3(4,4) = 7;
-
-
 	printMatrix(M3);
+
+	//Index mapping example
+	IndexMap * indexMap = new IndexMap(4,4); //Mapping 4x4 matrix
+
+	cout << indexMap->getXFromNodes(3,1,3,2)<<endl; //Get index of x between 31 and 32 nodes
+
+	NodePair pair = indexMap->getNodesFromX(17); //Get nodes terminals of x
+	cout << "pair" << endl;
+	pair.printPair();
 
 
 	return 0;

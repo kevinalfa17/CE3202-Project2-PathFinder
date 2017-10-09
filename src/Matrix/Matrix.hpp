@@ -11,8 +11,12 @@
 #include <cstddef>
 #include <cstring>
 #include <cassert>
+
+#if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #include <emmintrin.h>
+#endif
+
 #include "../config.h"
 #include "MatrixException.hpp"
 #include "PaddingWarningException.hpp"
