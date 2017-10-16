@@ -8,3 +8,6 @@ cmake CMakelists.txt
 
 SIMD disable compile:
 cmake CMakelists.txt -DIS_SIMD_ACTIVE=OFF
+
+OpenCV Install
+https://www.learnopencv.com/install-opencv3-on-ubuntu/
