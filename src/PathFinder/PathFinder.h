@@ -73,19 +73,19 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	indexMap = new IndexMap(imgRows,imgCols);
 
 	cols = 2*imgRows*imgCols -(imgRows+imgCols); //Incognites number
-	rows = imgRows*imgCols; //Equations number
+	rows = 2*imgRows*imgCols -(imgRows+imgCols)+1; //Equations number
 
 	A = Matrix<int>(rows, cols, 0, Matrix<int>::Padded);
-	//x = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
-	//b = Matrix<int>(rows, 1, 0, Matrix<int>::Padded);
+	x = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
+	b = Matrix<int>(rows, 1, 0, Matrix<int>::Padded);
 
 	//Input current
 	int initialPosition = (initialCol) + imgCols*initialRow;
-	//b(initialPosition,0) = 1;
+	b(initialPosition,0) = 1;
 
 	//Output current
 	int finalPosition = (finalCol) + imgCols*finalRow;
-	//b(finalPosition,0) = -1;
+	b(finalPosition,0) = -1;
 
 	getNodeEquations();
 	getMeshEquations();

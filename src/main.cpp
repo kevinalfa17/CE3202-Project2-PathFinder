@@ -127,14 +127,14 @@ int main() {
 	pair.printPair();
 
 	//Initializer list test
-	Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
-	printMatrix(B);
+	//Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
+	//printMatrix(B);
 
 	//PathFinder
 	uploadImage->upload();
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
 	Matrix<int> A = pathFinder->getA();
-	//printMatrix(A);
+	printMatrix(A);
 
 	
 	
