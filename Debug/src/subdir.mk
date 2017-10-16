@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/CE3202-Project2-PathFinder.cpp 
+../src/main.cpp 
 
 OBJS += \
-./src/CE3202-Project2-PathFinder.o 
+./src/main.o 
 
 CPP_DEPS += \
-./src/CE3202-Project2-PathFinder.d 
+./src/main.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

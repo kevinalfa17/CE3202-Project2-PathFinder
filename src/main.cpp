@@ -8,8 +8,9 @@
 
 #include "config.h"
 #include "Matrix/Matrix.hpp"
-#include "NodePair.h"
-#include "IndexMap.h"
+#include "PathFinder/NodePair.h"
+#include "PathFinder/IndexMap.h"
+#include "PathFinder/PathFinder.h"
 #include <iostream>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
@@ -99,9 +100,18 @@ int main() {
 
 	cout << indexMap->getXFromNodes(3,1,3,2)<<endl; //Get index of x between 31 and 32 nodes
 
-	NodePair pair = indexMap->getNodesFromX(17); //Get nodes terminals of x
+	NodePair pair = indexMap->getNodesFromX(22); //Get nodes terminals of x
 	cout << "pair" << endl;
 	pair.printPair();
+
+	//Initializer list test
+	Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
+	printMatrix(B);
+
+	//PathFinder
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2);
+	Matrix<int> A = pathFinder->getA();
+	//printMatrix(A);
 
 
 	return 0;
