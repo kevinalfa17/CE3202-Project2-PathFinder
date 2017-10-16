@@ -14,11 +14,15 @@
 #include <iostream>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
+#include <opencv2/opencv.hpp>
+#include "UploadImage.h"
+
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #endif
 
+using namespace cv;
 using namespace std;
 using namespace anpi;
 using namespace boost::bimaps;
@@ -40,6 +44,21 @@ void printMatrix(anpi::Matrix<T> &m){
 	}
 }
 
+void fillHoles(Mat &mask)
+{
+    /*
+     This hole filling algorithm is decribed in this post
+     https://www.learnopencv.com/filling-holes-in-an-image-using-opencv-python-c/
+     */
+
+    Mat maskFloodfill = mask.clone();
+    floodFill(maskFloodfill, cv::Point(0,0), Scalar(255));
+    Mat mask2;
+    bitwise_not(maskFloodfill, mask2);
+    mask = (mask2 | mask);
+
+}
+
 /*template< class MapType >
 void print_map(const MapType & map)
 {
@@ -57,6 +76,9 @@ void print_map(const MapType & map)
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 int main() {
 	cout << "!!!Hello World SIMD is active and available!!!!" << endl; // prints !!!Hello World!!!
+	UploadImage * uploadImage = new UploadImage();
+	uploadImage->upload();
+
 
 	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
 	int length = 400;
