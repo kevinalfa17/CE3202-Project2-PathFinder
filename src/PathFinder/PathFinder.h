@@ -12,7 +12,10 @@
 #include "IndexMap.h"
 #include "NodePair.h"
 #include <iostream>
+#include <opencv2/opencv.hpp>
 using namespace anpi;
+using namespace cv;
+using namespace std;
 
 template<typename T>
 class PathFinder{
@@ -30,10 +33,14 @@ private:
 	int rows;
 	int cols;
 
+	//Image matrix
+	Mat imageMatrix;
+	int imgRows;
+	int imgCols;
 
 
 public:
-	PathFinder(int initialRow, int initialCol, int finalRow, int finalCol);
+	PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map);
 
 	const Matrix<int>& getA() const {
 		return A;
@@ -48,16 +55,19 @@ public:
 	}
 
 private:
-	void getNodeEquations(int imgRows, int imgCols);
+	void getNodeEquations();
+	void getMeshEquations();
 
 };
 
 template<typename T>
-PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int finalCol){
+PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map){
 
-	//Just for test, replace with OpenCV image properties
-	int imgRows = 3;
-	int imgCols = 3;
+	this->imageMatrix = map;
+	cout << map << endl;
+	//Just for test, replace with OpenCV image properties Ready jaja
+	imgRows = map.rows;
+	imgCols = map.cols;
 
 
 	indexMap = new IndexMap(imgRows,imgCols);
@@ -77,27 +87,28 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	int finalPosition = (finalCol) + imgCols*finalRow;
 	//b(finalPosition,0) = -1;
 
-	getNodeEquations(imgRows, imgCols);
+	getNodeEquations();
+	getMeshEquations();
 
 
 }
 
 template<typename T>
-void PathFinder<T>::getNodeEquations(int imgRows, int imgCols){
+void PathFinder<T>::getNodeEquations(){
 
 	int position = 0;
 	int equation_row = 0;
 
-	for(int i = 0; i < imgRows; i++){
-		for(int j = 0; j < imgCols; j++){
+	for(int i = 0; i < this->imgRows; i++){
+		for(int j = 0; j < this->imgCols; j++){
 
 			//Right current
-			if(j < imgCols-1){
+			if(j < this->imgCols-1){
 				position = indexMap->getXFromNodes(i,j,i,j+1);
 				A(equation_row,position) = -1;
 			}
 			//Down current
-			if(i < imgRows-1){
+			if(i < this->imgRows-1){
 				position = indexMap->getXFromNodes(i,j,i+1,j);
 				A(equation_row,position) = -1;
 			}
@@ -117,8 +128,53 @@ void PathFinder<T>::getNodeEquations(int imgRows, int imgCols){
 
 		}
 	}
-
 }
 
+template<typename T>
+void PathFinder<T>::getMeshEquations(){
+
+	int position = 0;
+	//int equation_row = this->imgRows * this->imgCols;
+	int equation_row = 0;
+	int value;
+	for(int i = 0; i < this->imgRows; i++){
+		for(int j = 0; j < this->imgCols; j++){
+			if (this->imageMatrix.template at<uchar>(i, j) > 250){
+				cout<<"blanco "<<i<<" "<<j<<endl;
+				value = 1;
+			} else {
+				cout<<"negro "<<i<<" "<<j<<endl;
+				value = 1000000;
+			}
+			
+			//Right current
+			if(j < this->imgCols-1){
+				position = indexMap->getXFromNodes(i,j,i,j+1);
+				A(equation_row,position) = value;
+			}
+			//Down current
+			if(i < this->imgRows-1){
+				position = indexMap->getXFromNodes(i,j,i+1,j);
+				A(equation_row,position) = value;
+			}
+
+			//Left current
+			if(j > 0){
+				position = indexMap->getXFromNodes(i,j,i,j-1);
+				A(equation_row,position) = -value;
+			}
+			//Up current
+			if(i > 0){
+				position = indexMap->getXFromNodes(i,j,i-1,j);
+				A(equation_row,position) = -value;
+			}
+			cout<< "eq "<< equation_row<<endl;
+			equation_row++;
+			
+
+		}
+	}
+
+}
 
 #endif /* PATHFINDER_PATHFINDER_H_ */

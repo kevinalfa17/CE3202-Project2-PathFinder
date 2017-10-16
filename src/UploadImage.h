@@ -19,19 +19,29 @@ class UploadImage {
 public:
 	UploadImage();
 	void upload();
+	Mat getImage();
+	Mat image;
 };
 
 
 UploadImage::UploadImage() {
 }
 void UploadImage::upload() {
-	   Mat image = imread( "Ruta.png", IMREAD_COLOR ); // Read the file
+	   this->image = imread( "Ruta10px.png", 0 ); // Read the file
+			      /**
 			       namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
+			       cout << image<< endl;
+			       cout << image.rows << endl;
+			       cout << image.cols << endl;
 			       imshow( "Display window", image );                // Show our image inside it.
 			       waitKey(0); // Wait for a keystroke in the window
+			      */
 
 }
 
+Mat UploadImage::getImage(){
+	return this->image;
+}
 
 
 #endif /* UPLOADIMAGE_H_ */

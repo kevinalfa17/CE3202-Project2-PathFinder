@@ -77,7 +77,7 @@ void print_map(const MapType & map)
 int main() {
 	cout << "!!!Hello World SIMD is active and available!!!!" << endl; // prints !!!Hello World!!!
 	UploadImage * uploadImage = new UploadImage();
-	uploadImage->upload();
+	
 
 
 	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
@@ -131,11 +131,13 @@ int main() {
 	printMatrix(B);
 
 	//PathFinder
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2);
+	uploadImage->upload();
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
 	Matrix<int> A = pathFinder->getA();
 	//printMatrix(A);
 
-
+	
+	
 	return 0;
 }
 #else
