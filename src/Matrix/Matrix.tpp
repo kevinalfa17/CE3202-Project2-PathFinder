@@ -23,7 +23,7 @@ Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType type)
 	switch(type){
 	case DoNotInitialize:
 		if(((sizeof(T)*c)/16) != 1 || (r*c)%(16/sizeof(T)) != 0){
-			throw PaddingWarningException();
+			//throw PaddingWarningException();
 		}
 
 		allocate(r,c);
@@ -45,6 +45,22 @@ Matrix<T>::Matrix(const size_t r, const size_t c, const T initVal, const Initial
 template<typename T>
 Matrix<T>::Matrix(const size_t r,  const size_t c, const T *const initMem,const InitializationType type): Matrix(r,c,type) {
 	fill(initMem);
+}
+
+//Initialization with initializer list
+template<typename T>
+Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(lst.size(),(lst.size()>0) ? lst.begin()->size() : 0,Padded)
+{
+	size_t j = 0;
+	for (const auto& r : lst) {
+		// Verify that all rows have the same number of columns
+		assert( (r.size()==_cols) && "Check number of columns in each row");
+		size_t rowIdx=j*_dcols;
+		for (const auto& c : r) {
+			_data[rowIdx++] = c;
+		}
+		++j;
+	}
 }
 
 
@@ -108,11 +124,12 @@ void Matrix<T>::padded_allocate(const size_t r, const size_t c) {
 	if ( (r!=_rows) || (c!=_cols) ) {
 		deallocate(); //Free aligned memory
 		
-		float res0 = (sizeof(T)*c);
+		
+		int res0 = (sizeof(T)*c);
 		float res = res0/16; //Aux variable to check padding required 
 		int cols_per_row = 16/sizeof(T); //Max number of cols for T type
 
-		if(res > 1){ //Extra column padding required
+		if(res0%16 != 0 && res > 1){ //Extra column padding required
 			_dcols = ((c/cols_per_row)*cols_per_row+cols_per_row);		  
 		}
 		else if(res < 1){ //Minimum colums 16/sizeof(T)required. Ex: 4 in float or 2 in double
@@ -689,7 +706,7 @@ template<typename T>
 Matrix<T>::Matrix(const size_t r,  const size_t c, const T *const initMem, const InitializationType type): Matrix(r,c,DoNotInitialize) {
 	fill(initMem);
 }
-/*
+
 //Initialization with initializer list
 template<typename T>
 Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(lst.size(),(lst.size()>0) ? lst.begin()->size() : 0,DoNotInitialize)
@@ -704,7 +721,7 @@ Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(
 		}
 		++j;
 	}
-}*/
+}
 
 //Copy constructor (Deep copy)
 template<typename T>

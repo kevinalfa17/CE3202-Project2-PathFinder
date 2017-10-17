@@ -81,6 +81,18 @@ namespace anpi
      */
     explicit Matrix(const size_t rows,const size_t cols,const T *const initMem, const InitializationType type = DoNotInitialize);
 
+    /**
+     * Constructs a matrix from a std::initializer_list
+     *
+     * This allows to construct and initialize a 2x3 matrix in this way:
+     *
+     * \code
+     * anpi::Matrix<int> m={ {1,2,3}, {4,5,6} };
+     * \endcode
+     */
+    Matrix(std::initializer_list< std::initializer_list<T> > lst);
+
+
 
     /**
      * Copy constructor will do a deep copy on the given matrix

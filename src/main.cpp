@@ -8,17 +8,27 @@
 
 #include "config.h"
 #include "Matrix/Matrix.hpp"
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
 #include "Matrix/MatrixDescomposition.h"
 #include "NodePair.h"
 #include "IndexMap.h"
+=======
+#include "PathFinder/NodePair.h"
+#include "PathFinder/IndexMap.h"
+#include "PathFinder/PathFinder.h"
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
 #include <iostream>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
+#include <opencv2/opencv.hpp>
+#include "UploadImage.h"
+
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #endif
 
+using namespace cv;
 using namespace std;
 using namespace anpi;
 using namespace boost::bimaps;
@@ -40,6 +50,7 @@ void printMatrix(anpi::Matrix<T> &m){
 	}
 }
 
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
 template <typename T>
 void printVector(vector<T> &v){
 	cout << "[\t";
@@ -47,6 +58,21 @@ void printVector(vector<T> &v){
 		cout << v.at(i) << "\t";
 	}
 	cout << "]" << endl;
+=======
+void fillHoles(Mat &mask)
+{
+    /*
+     This hole filling algorithm is decribed in this post
+     https://www.learnopencv.com/filling-holes-in-an-image-using-opencv-python-c/
+     */
+
+    Mat maskFloodfill = mask.clone();
+    floodFill(maskFloodfill, cv::Point(0,0), Scalar(255));
+    Mat mask2;
+    bitwise_not(maskFloodfill, mask2);
+    mask = (mask2 | mask);
+
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
 }
 
 /*template< class MapType >
@@ -66,6 +92,9 @@ void print_map(const MapType & map)
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 int main() {
 	cout << "!!!Hello World SIMD is active and available!!!!" << endl; // prints !!!Hello World!!!
+	UploadImage * uploadImage = new UploadImage();
+	
+
 
 	/*//SSE Example: calculate sqrt(x)/x for values from 1 to 400
 	int length = 400;
@@ -109,7 +138,7 @@ int main() {
 
 	cout << indexMap->getXFromNodes(3,1,3,2)<<endl; //Get index of x between 31 and 32 nodes
 
-	NodePair pair = indexMap->getNodesFromX(17); //Get nodes terminals of x
+	NodePair pair = indexMap->getNodesFromX(22); //Get nodes terminals of x
 	cout << "pair" << endl;
 	pair.printPair();*/
 
@@ -143,12 +172,26 @@ int main() {
 	vector<double> x;
 
 
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
 	Matrix<double> M_2 = Matrix<double>(3, 3, Matrix<double>::Padded);
 	MatrixDescomposition<double> *ss = new MatrixDescomposition<double>();
 	//ss->lu(M_1, M_2);
 	ss->solveLU(M_1, x, b);
 	printVector(x);
+=======
+	//Initializer list test
+	//Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
+	//printMatrix(B);
 
+	//PathFinder
+	uploadImage->upload();
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
+	Matrix<int> A = pathFinder->getA();
+	printMatrix(A);
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
+
+	
+	
 	return 0;
 }
 #else
