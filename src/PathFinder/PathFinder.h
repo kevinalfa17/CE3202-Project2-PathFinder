@@ -56,7 +56,7 @@ public:
 	}
 
 private:
-	void getNodeEquations();
+	void getNodeEquations(int initialRow, int initialCol, int finalRow, int finalCol);
 	void getMeshEquations();
 
 };
@@ -65,15 +65,13 @@ template<typename T>
 PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map){
 
 	this->imageMatrix = map;
-	cout << map << endl;
 	imgRows = map.rows;
 	imgCols = map.cols;
-
 
 	indexMap = new IndexMap(imgRows,imgCols);
 
 	cols = 2*imgRows*imgCols -(imgRows+imgCols); //Incognites number
-	rows = 2*imgRows*imgCols -(imgRows+imgCols); //Equations number
+	rows = cols; //Equations number
 
 	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
 	b = *(new vector<T>(rows));
@@ -86,22 +84,52 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	int finalPosition = (finalCol) + imgCols*finalRow;
 	b.at(finalPosition) = -1;
 
-	getNodeEquations();
+	getNodeEquations(initialRow, initialCol, finalRow, finalCol);
 	getMeshEquations();
 
 	MatrixDescomposition<T> * solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
-
 }
 
 template<typename T>
-void PathFinder<T>::getNodeEquations(){
+void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRow, int finalCol){
 
 	int position = 0;
 	int equation_row = 0;
+	int flag = 0;
+	int startJ = 0;
+	int endJ = 0;
+
+	//Check if 0,0 edge is free
+	if(!(initialRow == 0 && initialCol == 0) && !(finalRow == 0 && finalCol == 0)){
+		flag = 0;
+	}
+	//Check if 0,cols-1 edge is free (Upper right)
+	else if(!(initialRow == 0 && initialCol == this->imgCols-1) && !(finalRow == 0 && finalCol == this->imgCols-1)){
+		flag = 1;
+	}
+	//rows-1,0 edge is free (Lower left)
+	else {
+		flag = 2;
+	}
 
 	for(int i = 0; i < this->imgRows; i++){
-		for(int j = 0; j < this->imgCols; j++){
+
+		//Remove one free node
+		if((flag == 0 && i == 0) || (flag == 2 && i == this->imgRows-1)){
+			startJ = 1;
+			endJ = this->imgCols;
+		}
+		else if(flag == 1 && i == 0){
+			startJ = 0;
+			endJ = this->imgCols-1;
+		}
+		else{
+			startJ = 0;
+			endJ = this->imgCols;
+		}
+
+		for(int j = startJ; j < endJ; j++){
 
 			//Right current
 			if(j < this->imgCols-1){

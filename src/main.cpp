@@ -94,7 +94,7 @@ int main() {
 
 
 	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
-	int length = 400;
+	/*int length = 400;
 	float* pResult = (float*) _mm_malloc (length * sizeof(float), 16);//Align 400 float spaces to 16-byte for SSE
 
 	__m128 x; //16 bytes vector (128bits)
@@ -128,7 +128,7 @@ int main() {
 	Matrix<float> M2 = Matrix<float>(5, 5, float(5), Matrix<float>::Padded);
 	Matrix<float> M3 = M2 - M;
 	M3(4,4) = 7;
-	printMatrix(M3);
+	printMatrix(M3);*
 
 	//Index mapping example
 	IndexMap * indexMap = new IndexMap(4,4); //Mapping 4x4 matrix
@@ -137,7 +137,7 @@ int main() {
 
 	NodePair pair = indexMap->getNodesFromX(22); //Get nodes terminals of x
 	cout << "pair" << endl;
-	pair.printPair();
+	pair.printPair();*/
 
 	//Initializer list test
 	//Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
@@ -145,9 +145,9 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
-	//Matrix<float> A = pathFinder->getA();
-	//vector<float> x = pathFinder->getX();
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,0,2,uploadImage->getImage());
+	Matrix<float> A = pathFinder->getA();
+	vector<float> x = pathFinder->getX();
 	//printMatrix(A);
 
 
