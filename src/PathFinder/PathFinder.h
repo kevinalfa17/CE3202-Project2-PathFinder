@@ -22,9 +22,9 @@ class PathFinder{
 private:
 
 	//Ax = b system
-	Matrix<int>  A;
+	Matrix<T>  A;
 	Matrix<T>  x; //Solution vector
-	Matrix<int>  b;
+	Matrix<T>  b;
 
 	//Map of vector-nodes
 	IndexMap * indexMap;
@@ -42,11 +42,11 @@ private:
 public:
 	PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map);
 
-	const Matrix<int>& getA() const {
+	const Matrix<T>& getA() const {
 		return A;
 	}
 
-	const Matrix<int>& getB() const {
+	const Matrix<T>& getB() const {
 		return b;
 	}
 
@@ -74,9 +74,9 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	cols = 2*imgRows*imgCols -(imgRows+imgCols); //Incognites number
 	rows = 2*imgRows*imgCols -(imgRows+imgCols)+1; //Equations number
 
-	A = Matrix<int>(rows, cols, 0, Matrix<int>::Padded);
+	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
 	x = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
-	b = Matrix<int>(rows, 1, 0, Matrix<int>::Padded);
+	b = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
 
 	//Input current
 	int initialPosition = (initialCol) + imgCols*initialRow;

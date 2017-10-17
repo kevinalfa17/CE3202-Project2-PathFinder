@@ -133,7 +133,7 @@ int main() {
 	//PathFinder
 	uploadImage->upload();
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
-	Matrix<int> A = pathFinder->getA();
+	Matrix<float> A = pathFinder->getA();
 	printMatrix(A);
 
 	
