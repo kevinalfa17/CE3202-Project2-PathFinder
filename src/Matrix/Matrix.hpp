@@ -128,7 +128,7 @@ namespace anpi
     inline T* operator[](const size_t row) {return _data + row*_dcols;}
 
     /// Return read-only pointer to a given row
-    const T* operator[](const size_t row) const {return _data + row*_dcols;}
+    //const T* operator[](const size_t row) const {return _data + row*_dcols;}
 
     /// Return reference to the element at the r row and c column
     T& operator()(const size_t row,const size_t col) {
