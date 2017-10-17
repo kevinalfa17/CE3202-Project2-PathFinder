@@ -65,7 +65,6 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	this->imageMatrix = map;
 	cout << map << endl;
-	//Just for test, replace with OpenCV image properties Ready jaja
 	imgRows = map.rows;
 	imgCols = map.cols;
 
@@ -132,45 +131,51 @@ void PathFinder<T>::getNodeEquations(){
 
 template<typename T>
 void PathFinder<T>::getMeshEquations(){
-
 	int position = 0;
-	//int equation_row = this->imgRows * this->imgCols;
-	int equation_row = 0;
-	int value;
-	for(int i = 0; i < this->imgRows; i++){
-		for(int j = 0; j < this->imgCols; j++){
-			if (this->imageMatrix.template at<uchar>(i, j) > 250){
-				cout<<"blanco "<<i<<" "<<j<<endl;
+	int equation_row = this->imgRows * this->imgCols-1;
+	int value = 0;
+	for(int i = 0; i < this->imgRows-1; i++){
+		for(int j = 0; j < this->imgCols-1; j++){
+			if ((int)this->imageMatrix.template at<uchar>(i, j) > 250 and (int)this->imageMatrix.template at<uchar>(i, j+1) > 250){
 				value = 1;
+				position = indexMap->getXFromNodes(i,j,i,j+1);
+				A(equation_row,position) = value;
 			} else {
-				cout<<"negro "<<i<<" "<<j<<endl;
 				value = 1000000;
-			}
-			
-			//Right current
-			if(j < this->imgCols-1){
 				position = indexMap->getXFromNodes(i,j,i,j+1);
 				A(equation_row,position) = value;
 			}
-			//Down current
-			if(i < this->imgRows-1){
+
+			if ((int)this->imageMatrix.template at<uchar>(i, j) > 250 and (int)this->imageMatrix.template at<uchar>(i+1, j) > 250){
+				value = 1;
 				position = indexMap->getXFromNodes(i,j,i+1,j);
+				A(equation_row,position) = -value;
+			} else {
+				value = 1000000;
+				position = indexMap->getXFromNodes(i,j,i+1,j);
+				A(equation_row,position) = -value;
+			}
+
+			if ((int)this->imageMatrix.template at<uchar>(i, j+1) > 250 and (int)this->imageMatrix.template at<uchar>(i+1, j+1) > 250){
+				value = 1;
+				position = indexMap->getXFromNodes(i,j+1,i+1,j+1);
+				A(equation_row,position) = value;
+			} else {
+				value = 1000000;
+				position = indexMap->getXFromNodes(i,j+1,i+1,j+1);
 				A(equation_row,position) = value;
 			}
 
-			//Left current
-			if(j > 0){
-				position = indexMap->getXFromNodes(i,j,i,j-1);
+			if ((int)this->imageMatrix.template at<uchar>(i+1, j) > 250 and (int)this->imageMatrix.template at<uchar>(i+1, j+1) > 250){
+				value = 1;
+				position = indexMap->getXFromNodes(i+1,j,i+1,j+1);
+				A(equation_row,position) = -value;
+			} else {
+				value = 1000000;	
+				position = indexMap->getXFromNodes(i+1,j,i+1,j+1);
 				A(equation_row,position) = -value;
 			}
-			//Up current
-			if(i > 0){
-				position = indexMap->getXFromNodes(i,j,i-1,j);
-				A(equation_row,position) = -value;
-			}
-			cout<< "eq "<< equation_row<<endl;
 			equation_row++;
-			
 
 		}
 	}
