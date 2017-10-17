@@ -46,16 +46,16 @@ void printMatrix(anpi::Matrix<T> &m){
 
 void fillHoles(Mat &mask)
 {
-	/*
+    /*
      This hole filling algorithm is decribed in this post
      https://www.learnopencv.com/filling-holes-in-an-image-using-opencv-python-c/
-	 */
+     */
 
-	Mat maskFloodfill = mask.clone();
-	floodFill(maskFloodfill, cv::Point(0,0), Scalar(255));
-	Mat mask2;
-	bitwise_not(maskFloodfill, mask2);
-	mask = (mask2 | mask);
+    Mat maskFloodfill = mask.clone();
+    floodFill(maskFloodfill, cv::Point(0,0), Scalar(255));
+    Mat mask2;
+    bitwise_not(maskFloodfill, mask2);
+    mask = (mask2 | mask);
 
 }
 
