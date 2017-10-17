@@ -8,9 +8,15 @@
 
 #include "config.h"
 #include "Matrix/Matrix.hpp"
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
+#include "Matrix/MatrixDescomposition.h"
+#include "NodePair.h"
+#include "IndexMap.h"
+=======
 #include "PathFinder/NodePair.h"
 #include "PathFinder/IndexMap.h"
 #include "PathFinder/PathFinder.h"
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
 #include <iostream>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
@@ -44,6 +50,15 @@ void printMatrix(anpi::Matrix<T> &m){
 	}
 }
 
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
+template <typename T>
+void printVector(vector<T> &v){
+	cout << "[\t";
+	for(int i = 0; i < v.size(); i++){
+		cout << v.at(i) << "\t";
+	}
+	cout << "]" << endl;
+=======
 void fillHoles(Mat &mask)
 {
     /*
@@ -57,6 +72,7 @@ void fillHoles(Mat &mask)
     bitwise_not(maskFloodfill, mask2);
     mask = (mask2 | mask);
 
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
 }
 
 /*template< class MapType >
@@ -80,7 +96,7 @@ int main() {
 	
 
 
-	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
+	/*//SSE Example: calculate sqrt(x)/x for values from 1 to 400
 	int length = 400;
 	float* pResult = (float*) _mm_malloc (length * sizeof(float), 16);//Align 400 float spaces to 16-byte for SSE
 
@@ -124,8 +140,45 @@ int main() {
 
 	NodePair pair = indexMap->getNodesFromX(22); //Get nodes terminals of x
 	cout << "pair" << endl;
-	pair.printPair();
+	pair.printPair();*/
 
+
+
+	Matrix<double> M_1 = Matrix<double>(4, 4, Matrix<double>::Padded);
+	M_1(0,0) = 4;
+	M_1(0,1) = 5;
+	M_1(0,2) = 7;
+	M_1(0,3) = 1;
+
+	M_1(2,0) = 1;
+	M_1(2,1) = 2;
+	M_1(2,2) = 4;
+	M_1(2,3) = 3;
+
+	M_1(1,0) = 1;
+	M_1(1,1) = 1;
+	M_1(1,2) = 3;
+	M_1(1,3) = 4;
+
+	M_1(3,0) = 1;
+	M_1(3,1) = 4;
+	M_1(3,2) = 6;
+	M_1(3,3) = 7;
+
+	printMatrixx(M_1);
+
+
+	vector<double> b = {1,2,3,4};
+	vector<double> x;
+
+
+<<<<<<< HEAD:src/CE3202-Project2-PathFinder.cpp
+	Matrix<double> M_2 = Matrix<double>(3, 3, Matrix<double>::Padded);
+	MatrixDescomposition<double> *ss = new MatrixDescomposition<double>();
+	//ss->lu(M_1, M_2);
+	ss->solveLU(M_1, x, b);
+	printVector(x);
+=======
 	//Initializer list test
 	//Matrix<int> B = {{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11},{1,2,3,4,5,6,7,8,9,10,11}};
 	//printMatrix(B);
@@ -135,6 +188,7 @@ int main() {
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
 	printMatrix(A);
+>>>>>>> a86450cd7fdef945c58bd22fa5b225c7f326c895:src/main.cpp
 
 	
 	
