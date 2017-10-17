@@ -44,6 +44,19 @@ void printMatrix(anpi::Matrix<T> &m){
 	}
 }
 
+/**
+ * @brief Print a vector
+ * @param v: Vector to print
+ */
+template <typename T>
+void printVector(vector<T> &v){
+	cout << "[\t";
+	for(int i = 0; i < v.size(); i++){
+		cout << v.at(i) << "\t";
+	}
+	cout << "]" << endl;
+}
+
 void fillHoles(Mat &mask)
 {
     /*
@@ -133,10 +146,18 @@ int main() {
 	//PathFinder
 	uploadImage->upload();
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
-	Matrix<int> A = pathFinder->getA();
-	printMatrix(A);
+	//Matrix<float> A = pathFinder->getA();
+	//vector<float> x = pathFinder->getX();
+	//printMatrix(A);
 
 
+	vector<float> xx = pathFinder->getX();
+	cout << "Vector size: " << xx.size() << endl;
+	cout << "[\t";
+	for(int i = 0; i < xx.size(); i++){
+		cout << xx.at(i) << "\t";
+	}
+	cout << "]" << endl;
 
 	return 0;
 }

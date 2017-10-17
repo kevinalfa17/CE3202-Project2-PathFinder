@@ -23,7 +23,8 @@
 							<tool command="g++ -std=c++11 " id="cdt.managedbuild.tool.gnu.cpp.compiler.base.34980742" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.optimization.level.615106685" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1502900482" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.816319894" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `pkg-config opencv --cflags --libs`" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.816319894" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 `pkg-config --libs --cflags opencv`" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1240487264" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1866433554" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1483010834" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">

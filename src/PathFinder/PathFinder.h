@@ -9,6 +9,7 @@
 #define PATHFINDER_PATHFINDER_H_
 
 #include "../Matrix/Matrix.hpp"
+#include "../Matrix/MatrixDescomposition.h"
 #include "IndexMap.h"
 #include "NodePair.h"
 #include <iostream>
@@ -23,8 +24,8 @@ private:
 
 	//Ax = b system
 	Matrix<T>  A;
-	Matrix<T>  x; //Solution vector
-	Matrix<T>  b;
+	vector<T>  x; //Solution vector
+	vector<T>  b;
 
 	//Map of vector-nodes
 	IndexMap * indexMap;
@@ -46,11 +47,11 @@ public:
 		return A;
 	}
 
-	const Matrix<T>& getB() const {
+	const vector<T>& getB() const {
 		return b;
 	}
 
-	const Matrix<T>& getX() const {
+	const vector<T>& getX() const {
 		return x;
 	}
 
@@ -72,23 +73,24 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	indexMap = new IndexMap(imgRows,imgCols);
 
 	cols = 2*imgRows*imgCols -(imgRows+imgCols); //Incognites number
-	rows = 2*imgRows*imgCols -(imgRows+imgCols)+1; //Equations number
+	rows = 2*imgRows*imgCols -(imgRows+imgCols); //Equations number
 
 	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
-	x = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
-	b = Matrix<T>(rows, 1, T(0), Matrix<T>::Padded);
+	b = *(new vector<T>(rows));
 
 	//Input current
 	int initialPosition = (initialCol) + imgCols*initialRow;
-	b(initialPosition,0) = 1;
+	b.at(initialPosition) = 1;
 
 	//Output current
 	int finalPosition = (finalCol) + imgCols*finalRow;
-	b(finalPosition,0) = -1;
+	b.at(finalPosition) = -1;
 
 	getNodeEquations();
 	getMeshEquations();
 
+	MatrixDescomposition<T> * solver = new MatrixDescomposition<T>();
+	solver->solveLU(A, x, b);
 
 }
 
