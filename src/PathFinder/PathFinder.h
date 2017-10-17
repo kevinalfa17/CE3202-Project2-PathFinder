@@ -133,7 +133,7 @@ template<typename T>
 void PathFinder<T>::getMeshEquations(){
 	int position = 0;
 	int equation_row = this->imgRows * this->imgCols-1;
-	int value = 0;
+	T value = 0;
 	for(int i = 0; i < this->imgRows-1; i++){
 		for(int j = 0; j < this->imgCols-1; j++){
 			if ((int)this->imageMatrix.template at<uchar>(i, j) > 250 and (int)this->imageMatrix.template at<uchar>(i, j+1) > 250){
