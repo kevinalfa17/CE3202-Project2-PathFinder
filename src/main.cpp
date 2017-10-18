@@ -139,12 +139,6 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-<<<<<<< HEAD
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,66,49,uploadImage->getImage());
-
-	Matrix<float> A = pathFinder->getA();
-	vector<float> b = pathFinder->getB();
-=======
 	//PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
 	PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
 
@@ -152,8 +146,6 @@ int main() {
 	vector<float> b = pathFinder->getB();
 	//printMatrix(A);
 	//printVector(b);
->>>>>>> c253def8323c6ab0898f4ada826879f8c4c8c3d8
-
 	/*vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
 	cout << "[\t";
@@ -173,6 +165,37 @@ int main() {
 	PathDrawer * pathDrawer = new PathDrawer(uploadImage->getImage());
 	pathDrawer->drawPath(points);
 
+	plotpy::Plot2d<float> plt;
+
+	plt.initialize(1);
+
+	plt.settitle("Culo");
+
+
+
+
+
+
+	Matrix<float> M_1 = {{6.2585e-07, 9.06919e-07, 2.8107e-07},
+			{4.79178e-07,7.90748e-07,3.1157e-07},
+			{0.5, 1, 0.5}};
+
+	Matrix<float> M_2 = {{0.5, 3.52374e-07, 3.82875e-07},
+			{1, 8.78743e-07, 1.07732e-06},
+			{0.5,  5.26368e-07, 6.94445e-07}};
+
+	printMatrix(M_1);
+	printMatrix(M_2);
+
+	vector<float> yv = {0,1,2,2,2};
+	vector<float> xv = {0,0,0,1,2};
+
+	plt.setVecRoute(M_1, M_2, xv, yv, 1);
+
+	plt.setxrange(-1, M_1.cols() +1);
+	plt.setyrange(-1, M_1.rows() +1);
+
+	plt.showallplots();
 
 
 	return 0;

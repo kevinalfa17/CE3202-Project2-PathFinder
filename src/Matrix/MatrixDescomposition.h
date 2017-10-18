@@ -125,7 +125,6 @@ void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 template<>
 void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		Matrix<float>& LU) {
-	cout << "CULO" << endl;
 	this->n = A.rows();
 	if(this->n != A.cols())
 		throw runtime_error("'A' matrix is not square in method: void lu(const Matrix<T>& A, Matrix<T>& LU)");
