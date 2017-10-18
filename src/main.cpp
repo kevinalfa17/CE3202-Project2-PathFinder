@@ -11,10 +11,12 @@
 #include "PathFinder/NodePair.h"
 #include "PathFinder/IndexMap.h"
 #include "PathFinder/PathFinder.h"
+#include "Graphics/PathDrawer.h"
 #include <iostream>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 #include "UploadImage.h"
 #include "Matrix/MatrixDescomposition.h"
 #include "plot/plotpy.h"
@@ -137,18 +139,40 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
+<<<<<<< HEAD
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,66,49,uploadImage->getImage());
 
 	Matrix<float> A = pathFinder->getA();
 	vector<float> b = pathFinder->getB();
+=======
+	//PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
+	PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
+
+	Matrix<float> A = pathFinder->getA();
+	vector<float> b = pathFinder->getB();
+	//printMatrix(A);
+	//printVector(b);
+>>>>>>> c253def8323c6ab0898f4ada826879f8c4c8c3d8
 	
-	vector<float> xx = pathFinder->getX();
+	/*vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
 	cout << "[\t";
 	for(int i = 0; i < xx.size(); i++){
 		cout << xx.at(i) << "\t";
 	}
+	cout << "]" << endl;*/
+
+	const vector<Point> * points = pathFinder->getPathPoints();
+
+	cout << "[\t";
+	for(int i = 0; i < points->size(); i++){
+		cout <<"("<< points->at(i).x <<","<<points->at(i).y<<")"<<"\t";
+	}
 	cout << "]" << endl;
+
+	PathDrawer * pathDrawer = new PathDrawer(uploadImage->getImage());
+	pathDrawer->drawPath(points);
+	
 
 
 	return 0;

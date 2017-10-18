@@ -15,8 +15,11 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
+#include <limits>
+#include <cmath>
 #include "../plot/plotpy.h"
 #include "math.h"
+
 using namespace anpi;
 using namespace cv;
 using namespace std;
@@ -45,6 +48,12 @@ class PathFinder
 	int imgRows;
 	int imgCols;
 
+	//Initial and final
+	int initialRow; 
+	int initialCol; 
+	int finalRow;
+	int finalCol;
+
   public:
 	PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map);
 
@@ -63,10 +72,10 @@ class PathFinder
 		return x;
 	}
 
-	const vector<Point> &getPathPoints();
+	const vector<Point> * getPathPoints();
 
   private:
-	void getNodeEquations(int initialRow, int initialCol, int finalRow, int finalCol);
+	void getNodeEquations();
 	void getMeshEquations();
 	void getXAxisMatrix();
 	void getYAxisMatrix();
@@ -81,6 +90,11 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	imgRows = map.rows;
 	imgCols = map.cols;
 
+	this->initialRow = initialRow;
+	this->initialCol = initialCol;
+	this->finalRow =  finalRow;
+	this->finalCol =  finalCol;
+
 	indexMap = new IndexMap(imgRows, imgCols);
 
 	cols = 2 * imgRows * imgCols - (imgRows + imgCols); //Incognites number
@@ -91,7 +105,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	y_axis = Matrix<T>(imgRows, imgCols, T(0), Matrix<T>::Padded);
 	b = *(new vector<T>(rows));
 
-	getNodeEquations(initialRow, initialCol, finalRow, finalCol);
+	getNodeEquations();
 	getMeshEquations();
 
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
@@ -113,7 +127,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 }
 
 template <typename T>
-void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRow, int finalCol)
+void PathFinder<T>::getNodeEquations()
 {
 
 	int position = 0;
@@ -121,54 +135,56 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 	int flag = 0;
 	int startJ = 0;
 	int endJ = 0;
-	int initialPosition = (initialCol) + this->imgCols * initialRow;
-	int finalPosition = (finalCol) + this->imgCols * finalRow;
+	int initialPosition = (this->initialCol) + this->imgCols * this->initialRow;
+	int finalPosition = (finalCol) + this->imgCols *this-> finalRow;
 
 	
 
 	//Check if 0,0 edge is free
-	if (!(initialRow == 0 && initialCol == 0) && !(finalRow == 0 && finalCol == 0))
+	if (!(this->initialRow == 0 && this->initialCol == 0) && !(finalRow == 0 && this-> finalCol == 0))
 	{
 		flag = 0;
 
 		//Input current
-		initialPosition = (initialCol - 1) + this->imgCols * initialRow;
+		initialPosition = (initialCol - 1) + this->imgCols * this-> initialRow;
 		//Output current
-		finalPosition = (finalCol - 1) + this->imgCols * finalRow;
+		finalPosition = (finalCol - 1) + this->imgCols * this->finalRow;
 	}
 	//Check if 0,cols-1 edge is free (Upper right)
-	else if (!(initialRow == 0 && initialCol == this->imgCols - 1) && !(finalRow == 0 && finalCol == this->imgCols - 1))
+	else if (!(initialRow == 0 && this-> initialCol == this->imgCols - 1) && !(finalRow == 0 && this->finalCol == this->imgCols - 1))
 	{
 		flag = 1;
-		if (!(initialRow == 0 && initialCol < this->imgCols - 1 ))
+		if (!(initialRow == 0 && this-> initialCol < this->imgCols - 1 ))
 		{
 			//Input current
-			initialPosition = (initialCol - 1) + this->imgCols * initialRow;
+			initialPosition = (initialCol - 1) + this->imgCols *this-> initialRow;
 		}
-		if (!(finalRow == 0 && finalCol < this->imgCols - 1))
+		if (!(finalRow == 0 && this->finalCol < this->imgCols - 1))
 		{
 			//Output current
-			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
+			finalPosition = (finalCol - 1) + this->imgCols *this->finalRow;
 		}
 	}
 	//rows-1,0 edge is free (Lower left)
 	else
 	{
 		flag = 2;
-		if (initialRow == this->imgRows - 1 && initialCol > 0 )
+		if (initialRow == this->imgRows - 1 && this->initialCol > 0 )
 		{
 			//Input current
-			initialPosition = (initialCol - 1) + this->imgCols * initialRow;
+			initialPosition = (initialCol - 1) + this->imgCols * this-> initialRow;
 		}
-		if (finalRow == this->imgRows - 1 && finalCol > 0)
+		if (finalRow == this->imgRows - 1 && this->finalCol > 0)
 		{
 			//Output current
-			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
+			finalPosition = (finalCol - 1) + this->imgCols * this->finalRow;
 		}
 	}
 
-	b.at(initialPosition) = 1;
-	b.at(finalPosition) = -1;
+
+	this->b.at(initialPosition) = 1;
+	this->b.at(finalPosition) = -1;
+
 
 	for (int i = 0; i < this->imgRows; i++)
 	{
@@ -291,7 +307,6 @@ void PathFinder<T>::getMeshEquations()
 
 }
 
-
 template<typename T>
 void PathFinder<T>::getXAxisMatrix(){
 			int position;
@@ -364,8 +379,83 @@ void PathFinder<T>::normalize(){
 }
 
 
-//const vector<Point> &getPathPoints()
-	//{
-	//}
+template <typename T>
+const vector<Point> * PathFinder<T>::getPathPoints()
+{
+	vector<Point> * points = new vector<Point>;
+	vector<T> solutions(this->x);
+	
+	int actualRow = this->initialRow;
+	int actualCol = this->initialCol;
+	T maxCurrent = 0;
+	T nextCurrent = 0;
+	int position = 0;
+	int nextX = 0;
+	int nextY = 0;
+
+	points->push_back(Point(actualRow,actualCol)); //Initial node
+	
+	
+	while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
+		maxCurrent = 0;
+
+		//Right current
+		if (actualCol < this->imgCols - 1)
+		{	
+			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow, actualCol  + 1);			
+			nextCurrent = abs(solutions.at(position));
+			if(nextCurrent > maxCurrent ){
+				maxCurrent = nextCurrent;
+				nextX = actualRow;
+				nextY = actualCol + 1;
+				solutions.at(position) = 0;
+			}
+			
+		}
+		//Down current
+		if (actualRow < this->imgRows - 1)
+		{
+			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow + 1, actualCol );
+			nextCurrent = abs(solutions.at(position));
+			if(nextCurrent > maxCurrent ){
+				maxCurrent = nextCurrent;
+				nextX = actualRow + 1;
+				nextY = actualCol;
+				solutions.at(position) = 0;
+			}
+		}
+		//Left current
+		if (actualCol > 0)
+		{
+			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow, actualCol  - 1);
+			nextCurrent = abs(solutions.at(position));
+			if(nextCurrent > maxCurrent ){
+				maxCurrent = nextCurrent;
+				nextX = actualRow;
+				nextY = actualCol - 1;
+				solutions.at(position) = 0;
+			}
+		}
+		//Up current
+		if (actualRow > 0)
+		{
+			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow - 1, actualCol);
+			nextCurrent = abs(solutions.at(position));
+			if(nextCurrent > maxCurrent ){
+				maxCurrent = nextCurrent;
+				nextX = actualRow - 1;
+				nextY = actualCol;
+				solutions.at(position) = 0;
+			}
+		}
+
+		actualRow = nextX;
+		actualCol = nextY;
+		points->push_back(Point(nextX,nextY));
+
+	}//End while
+	return points;
+
+}
 
 #endif /* PATHFINDER_PATHFINDER_H_ */
