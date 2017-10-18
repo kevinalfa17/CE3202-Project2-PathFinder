@@ -17,6 +17,8 @@
 #include <opencv2/opencv.hpp>
 #include "UploadImage.h"
 #include "Matrix/MatrixDescomposition.h"
+#include "plot/plotpy.h"
+
 
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
@@ -77,7 +79,6 @@ void fillHoles(Mat &mask)
 void print_map(const MapType & map)
 {
 	typedef typename MapType::const_iterator const_iterator;
-
 	for( const_iterator i = map.begin(), iend = map.end(); i != iend; ++i )
 	{
 		NodePair * pair = i->second;
@@ -97,31 +98,23 @@ int main() {
 	//SSE Example: calculate sqrt(x)/x for values from 1 to 400
 	/*int length = 400;
 	float* pResult = (float*) _mm_malloc (length * sizeof(float), 16);//Align 400 float spaces to 16-byte for SSE
-
 	__m128 x; //16 bytes vector (128bits)
 	__m128 xDelta = _mm_set1_ps(4.0f);// [4,4,4,4]
 	__m128 *pResultSSE = (__m128*)pResult; //Destination vector for each calc
-
 	x = _mm_set_ps(4.0f,3.0f,2.0f,1.0f); //Inicial vector [4,3,2,1]
-
 	//End condition, for will repeat only 100 times because SSE do 4 operations at the same time
 	const int SSELength = length/4;
 	//100 iterations
 	for(int i = 0; i<SSELength; i++){
-
 		__m128 xSqrt = _mm_sqrt_ps(x); // xSqrt = [sqrt(x_i),sqrt(x_i+1),sqrt(x_i+2),sqrt(x_i+3)]
-
 		pResultSSE[i] = _mm_div_ps(xSqrt,x); // pResultSSE[i] = [xSqrt_i/x,xSqrt_i+1/x,xSqrt_i+2/x,xSqrt_i/x]
-
 		// x = [x_i + 4, x_i+1 + 4, x_i+2 + 4,x_i+3 + 4], example: [1+4,2+4,3+4,4+4] = [5,6,7,8] in the first iteration
 		x = _mm_add_ps(x,xDelta);
 	}
-
 	//Print first 20 result to test
 	for(int i = 0;i<20;i++){
 		cout <<"Result["<<i<<"] = "<<pResult[i]<<endl;
 	}
-
 	//Matrix example
 	Matrix<float> M = Matrix<float>(5, 5, float(4), Matrix<float>::Padded);
 	cout <<"dcols "<<M.dcols()<<endl;
@@ -133,9 +126,7 @@ int main() {
 
 	//Index mapping example
 	IndexMap * indexMap = new IndexMap(4,4); //Mapping 4x4 matrix
-
 	cout << indexMap->getXFromNodes(3,1,3,2)<<endl; //Get index of x between 31 and 32 nodes
-
 	NodePair pair = indexMap->getNodesFromX(22); //Get nodes terminals of x
 	cout << "pair" << endl;
 	pair.printPair();*/
@@ -146,7 +137,8 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,1,uploadImage->getImage());
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
+
 	Matrix<float> A = pathFinder->getA();
 	Matrix<float> xA = pathFinder->getXAxis();
 	vector<float> b = pathFinder->getB();
@@ -161,6 +153,29 @@ int main() {
 		cout << xx.at(i) << "\t";
 	}
 	cout << "]" << endl;
+
+	Matrix<double> ma = {{1,0,5,7,0,7},
+			{3,3,44,6,8,8},
+			{6,4,3,3,4,6 },
+			{89,8,7,6,5,4},
+			{5,6,8,8,9,8 },
+			{65,4,3,3,4,5}};
+	Matrix<double> mb = {{1,0,5,7,0,7},
+			{3,3,44,6,8,8},
+			{6,4,3,3,4,6 },
+			{89,8,7,6,5,4},
+			{5,6,8,8,9,8 },
+			{65,4,3,3,4,5}};
+
+	plotpy::Plot2d<double> plt;
+
+	plt.initialize(1);
+
+	plt.settitle("title");
+
+	plt.quiver(mb, ma);
+
+		plt.showallplots();
 
 	return 0;
 }
