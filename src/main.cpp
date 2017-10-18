@@ -148,9 +148,11 @@ int main() {
 	uploadImage->upload();
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,1,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
+	Matrix<float> xA = pathFinder->getXAxis();
 	vector<float> b = pathFinder->getB();
 	printMatrix(A);
 	printVector(b);
+	printMatrix(xA);
 	
 	vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;

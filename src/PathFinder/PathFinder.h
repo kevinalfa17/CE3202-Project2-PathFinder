@@ -61,11 +61,17 @@ class PathFinder
 		return x;
 	}
 
+	const Matrix<T> &getXAxis() const
+	{
+		return x_axis;
+	}
+
 	const vector<Point> &getPathPoints();
 
   private:
 	void getNodeEquations(int initialRow, int initialCol, int finalRow, int finalCol);
 	void getMeshEquations();
+	void getXAxisMatrix();
 };
 
 template <typename T>
@@ -82,6 +88,8 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	rows = cols;										//Equations number
 
 	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
+	x_axis = Matrix<T>(imgRows, imgCols, Matrix<T>::Padded);
+	y_axis = Matrix<T>(imgRows, imgCols, Matrix<T>::Padded);
 	b = *(new vector<T>(rows));
 
 	getNodeEquations(initialRow, initialCol, finalRow, finalCol);
@@ -89,6 +97,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
+	getXAxisMatrix();
 }
 
 template <typename T>
@@ -100,6 +109,8 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 	int flag = 0;
 	int startJ = 0;
 	int endJ = 0;
+	int initialPosition = (initialCol) + this->imgCols * initialRow;
+	int finalPosition = (finalCol) + this->imgCols * finalRow;
 
 	//Check if 0,0 edge is free
 	if (!(initialRow == 0 && initialCol == 0) && !(finalRow == 0 && finalCol == 0))
@@ -107,9 +118,9 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 		flag = 0;
 
 		//Input current
-		int initialPosition = (initialCol - 1) + imgCols * initialRow;
+		initialPosition = (initialCol - 1) + this->imgCols * initialRow;
 		//Output current
-		int finalPosition = (finalCol - 1) + imgCols * finalRow;
+		finalPosition = (finalCol - 1) + this->imgCols * finalRow;
 	}
 	//Check if 0,cols-1 edge is free (Upper right)
 	else if (!(initialRow == 0 && initialCol == this->imgCols - 1) && !(finalRow == 0 && finalCol == this->imgCols - 1))
@@ -118,12 +129,12 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 		if (!(initialRow == 0 && initialCol == 0))
 		{
 			//Input current
-			int initialPosition = (initialCol - 1) + imgCols * initialRow;
+			initialPosition = (initialCol - 1) + this->imgCols * initialRow;
 		}
 		if (!(finalRow == 0 && finalCol == 0))
 		{
 			//Output current
-			int finalPosition = (finalCol - 1) + imgCols * finalRow;
+			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
 		}
 	}
 	//rows-1,0 edge is free (Lower left)
@@ -133,15 +144,18 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 		if (initialRow == this->imgRows - 1 && initialCol == this->imgCols - 1)
 		{
 			//Input current
-			int initialPosition = (initialCol - 1) + imgCols * initialRow;
+			initialPosition = (initialCol - 1) + this->imgCols * initialRow;
 		}
 		if (finalRow == this->imgRows - 1 && finalCol == this->imgCols - 1)
 		{
 			//Output current
-			int finalPosition = (finalCol - 1) + imgCols * finalRow;
+			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
 		}
 	}
-	
+
+	cout <<"ip "<<initialPosition<<endl;
+	cout <<"fp "<<finalPosition<<endl;
+
 	b.at(initialPosition) = 1;
 	b.at(finalPosition) = -1;
 
@@ -264,29 +278,37 @@ void PathFinder<T>::getMeshEquations()
 		}
 	}
 
-	const vector<Point> &getPathPoints()
-	{
-	}
 }
 
 
 template<typename T>
 void PathFinder<T>::getXAxisMatrix(){
+			int position;
+			T xl,xr;
 			for (int i = 0; i < this->imgRows; i++)
 			{
 				for (int j = 0; j < this->imgCols; j++)
 				{
+					position = 0;
+					xl = xr = 0;
+					
+					cout << i << " " << j <<endl;
 					//Left current
 					if(j > 0){
 						position = indexMap->getXFromNodes(i,j,i,j-1);
-						cout << "Left "<<x(position) <<endl;
+						xl = x[position];
 					}
 
 					//Right current
 					if(j < this->imgCols-1){
 						position = indexMap->getXFromNodes(i,j,i,j+1);
-						cout <<"Rigth "<< x(position) <<endl;
+						xr = x[position];
 					}
+
+					cout << "Left "<<xl << " Rigth "<<xr <<endl;
+					cout << "culo "<<xl +xr<<endl;
+					this->x_axis[i][j] = xl + xr; 
+					cout << x_axis(i,j) <<endl;
 
 					/**
 					//Down current
@@ -303,6 +325,13 @@ void PathFinder<T>::getXAxisMatrix(){
 					*/
 				}
 			}
+			printMatrixx(x_axis);
 }
+
+
+
+//const vector<Point> &getPathPoints()
+	//{
+	//}
 
 #endif /* PATHFINDER_PATHFINDER_H_ */
