@@ -68,7 +68,7 @@ inline MatrixDescomposition<T>::MatrixDescomposition() {
  * @param LU Decomposition of A.
  */
 template<typename T>
-inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
+void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 		Matrix<T>& LU) {
 	this->n = A.rows();
 		if(this->n != A.cols())
@@ -122,8 +122,8 @@ inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 	}
 }
 
-/*template<>
-inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
+template<>
+void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		Matrix<float>& LU) {
 	cout << "CULO" << endl;
 	this->n = A.rows();
@@ -180,9 +180,8 @@ inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 			for(j= k+1; j < this->n; j++)
 				LU[i][j] -= tmp*LU[k][j];
 		}
-
 	}
-}*/
+}
 
 /**
  * @brief Solves an systems of linear equations by LU decomposition.
