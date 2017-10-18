@@ -17,6 +17,8 @@
 #include <opencv2/core.hpp>
 #include <limits>
 #include <cmath>
+#include "../plot/plotpy.h"
+
 using namespace anpi;
 using namespace cv;
 using namespace std;
@@ -36,6 +38,9 @@ class PathFinder
 	//Matrix A properties
 	int rows;
 	int cols;
+
+	Matrix<T> x_axis;
+	Matrix<T> y_axis;
 
 	//Image matrix
 	Mat imageMatrix;
@@ -71,6 +76,9 @@ class PathFinder
   private:
 	void getNodeEquations();
 	void getMeshEquations();
+	void getXAxisMatrix();
+	void getYAxisMatrix();
+	void normalize(Matrix<T> &m);
 };
 
 template <typename T>
@@ -92,6 +100,8 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	rows = cols;										//Equations number
 
 	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
+	x_axis = Matrix<T>(imgRows, imgCols, T(0), Matrix<T>::Padded);
+	y_axis = Matrix<T>(imgRows, imgCols, T(0), Matrix<T>::Padded);
 	b = *(new vector<T>(rows));
 
 	getNodeEquations();
@@ -99,6 +109,23 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
+	getXAxisMatrix();
+	getYAxisMatrix();
+	cout<<endl;
+	printMatrixx(x_axis);
+	cout<<endl;
+	printMatrixx(y_axis);
+	cout<<endl;
+	plotpy::Plot2d<T> plt;
+
+	plt.initialize(1);
+
+	plt.settitle("titulo");
+
+	plt.quiver(x_axis, y_axis);
+
+	plt.showallplots();
+
 }
 
 template <typename T>
@@ -279,6 +306,83 @@ void PathFinder<T>::getMeshEquations()
 	}
 
 }
+
+template<typename T>
+void PathFinder<T>::getXAxisMatrix(){
+			int position;
+			T xl,xr;
+			for (int i = 0; i < this->imgRows; i++)
+			{
+				for (int j = 0; j < this->imgCols; j++)
+				{
+					position = 0;
+					xl = xr = 0;
+					
+					//Left current
+					if(j > 0){
+						position = indexMap->getXFromNodes(i,j,i,j-1);
+						xl = abs(x[position]);
+					}
+
+					//Right current
+					if(j < this->imgCols-1){
+						position = indexMap->getXFromNodes(i,j,i,j+1);
+						xr = abs(x[position]);
+					}
+					cout << i << " "<< j<<endl;
+					cout << xl << " " <<xr<<endl;
+					this->x_axis[i][j] = xl - xr; 
+				}
+			}
+		//normalize(x_axis);
+}
+
+template<typename T>
+void PathFinder<T>::getYAxisMatrix(){
+			int position;
+			T yu,yb;
+			for (int i = 0; i < this->imgRows; i++)
+			{
+				for (int j = 0; j < this->imgCols; j++)
+				{
+					position = 0;
+					yu = yb = 0;
+					
+					//Down current
+					if(i < this->imgRows-1){
+						position = indexMap->getXFromNodes(i,j,i+1,j);
+						yb = x[position];
+					}
+
+					//Up current
+					if(i > 0){
+						position = indexMap->getXFromNodes(i,j,i-1,j);
+						yu = x[position];
+					}
+					
+					this->y_axis[i][j] = yu + yb; 		
+				}
+			}
+			//normalize(y_axis);
+}
+
+
+template<typename T>
+void PathFinder<T>::normalize(Matrix<T> &m){
+	T big, tmp;
+	for(int i = 0; i < m.rows(); i++){
+			big = T(0);
+			for(int j = 0; j < m.cols(); j++){
+				if((tmp = abs(m(i, j))) > big)
+					big = tmp;
+				cout << "big " << big<<endl;
+			}
+			for(int j = 0; j < m.cols(); j++){
+				m(i,j)=m(i,j)/big;
+			}
+		}
+}
+
 
 template <typename T>
 const vector<Point> * PathFinder<T>::getPathPoints()

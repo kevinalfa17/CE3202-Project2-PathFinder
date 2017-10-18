@@ -17,7 +17,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include "UploadImage.h"
+#include "Matrix/MatrixDescomposition.h"
 #include "plot/plotpy.h"
+
 
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
@@ -136,12 +138,14 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
+	//PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
+
 	Matrix<float> A = pathFinder->getA();
-	vector<float> x = pathFinder->getX();
-	//printMatrix(A);
-
-
+	vector<float> b = pathFinder->getB();
+	printMatrix(A);
+	printVector(b);
+	
 	vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
 	cout << "[\t";
@@ -150,30 +154,6 @@ int main() {
 	}
 	cout << "]" << endl;
 
-	Matrix<double> ma = {{1,0,5,7,0,7},
-			{3,3,44,6,8,8},
-			{6,4,3,3,4,6 },
-			{89,8,7,6,5,4},
-			{5,6,8,8,9,8 },
-			{65,4,3,3,4,5}};
-	Matrix<double> mb = {{1,0,5,7,0,7},
-			{3,3,44,6,8,8},
-			{6,4,3,3,4,6 },
-			{89,8,7,6,5,4},
-			{5,6,8,8,9,8 },
-			{65,4,3,3,4,5}};
-
-			/*
-	plotpy::Plot2d<double> plt;
-
-	plt.initialize(1);
-
-	plt.settitle("title");
-
-	plt.quiver(mb, ma);
-
-	plt.showallplots();
-*/
 	const vector<Point> * points = pathFinder->getPathPoints();
 
 	cout << "[\t";

@@ -69,7 +69,7 @@ class  Plot2d{
 
 		void plot(std::vector<T> datax, std::vector<T> datay,std::string label);
 
-        void quiver(anpi::Matrix<T> X, anpi::Matrix<T> Y);
+        void quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y);
 
 		void showallplots();
 
@@ -207,7 +207,7 @@ void Plot2d<T>::plot(std::vector<T> datax, std::vector<T> datay, std::string lab
 }
 
 template<typename T>
-void Plot2d<T>::quiver(anpi::Matrix<T> X, anpi::Matrix<T> Y) {
+void Plot2d<T>::quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y) {
 	std::string tmp1 = "datax = [";
 	std::string tmp2 = "datay = [";
     std::string tmp3 = "plt.quiver(datax,datay,units='width')";
