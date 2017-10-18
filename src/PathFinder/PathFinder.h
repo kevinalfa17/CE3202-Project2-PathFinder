@@ -100,6 +100,8 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 	int initialPosition = (initialCol) + this->imgCols * initialRow;
 	int finalPosition = (finalCol) + this->imgCols * finalRow;
 
+	
+
 	//Check if 0,0 edge is free
 	if (!(initialRow == 0 && initialCol == 0) && !(finalRow == 0 && finalCol == 0))
 	{
@@ -129,20 +131,7 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 	else
 	{
 		flag = 2;
-		if (initialRow == this->imgRows - 1 && initialCol == this->imgCols - 1)
-		{
-			//Input current
-			initialPosition = (initialCol - 1) + this->imgCols * initialRow;
-		}
-		if (finalRow == this->imgRows - 1 && finalCol == this->imgCols - 1)
-		{
-			//Output current
-			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
-		}
 	}
-
-	cout <<"ip "<<initialPosition<<endl;
-	cout <<"fp "<<finalPosition<<endl;
 
 	b.at(initialPosition) = 1;
 	b.at(finalPosition) = -1;
