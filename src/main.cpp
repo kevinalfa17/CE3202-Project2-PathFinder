@@ -140,11 +140,9 @@ int main() {
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,2,uploadImage->getImage());
 
 	Matrix<float> A = pathFinder->getA();
-	Matrix<float> xA = pathFinder->getXAxis();
 	vector<float> b = pathFinder->getB();
 	printMatrix(A);
 	printVector(b);
-	printMatrix(xA);
 	
 	vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
@@ -154,28 +152,6 @@ int main() {
 	}
 	cout << "]" << endl;
 
-	Matrix<double> ma = {{1,0,5,7,0,7},
-			{3,3,44,6,8,8},
-			{6,4,3,3,4,6 },
-			{89,8,7,6,5,4},
-			{5,6,8,8,9,8 },
-			{65,4,3,3,4,5}};
-	Matrix<double> mb = {{1,0,5,7,0,7},
-			{3,3,44,6,8,8},
-			{6,4,3,3,4,6 },
-			{89,8,7,6,5,4},
-			{5,6,8,8,9,8 },
-			{65,4,3,3,4,5}};
-
-	plotpy::Plot2d<double> plt;
-
-	plt.initialize(1);
-
-	plt.settitle("title");
-
-	plt.quiver(mb, ma);
-
-		plt.showallplots();
 
 	return 0;
 }
