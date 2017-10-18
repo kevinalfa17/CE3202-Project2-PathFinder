@@ -27,7 +27,7 @@ public:
 UploadImage::UploadImage() {
 }
 void UploadImage::upload() {
-	   this->image = imread( "Ruta3x3.png", 0 ); // Read the file
+	   this->image = imread( "Ruta.png", 0 ); // Read the file
 			      /**
 			       namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
 			       cout << image<< endl;

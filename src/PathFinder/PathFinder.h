@@ -16,6 +16,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include "../plot/plotpy.h"
+#include "math.h"
 using namespace anpi;
 using namespace cv;
 using namespace std;
@@ -69,7 +70,7 @@ class PathFinder
 	void getMeshEquations();
 	void getXAxisMatrix();
 	void getYAxisMatrix();
-	void normalize(Matrix<T> &m);
+	void normalize();
 };
 
 template <typename T>
@@ -97,11 +98,8 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	solver->solveLU(A, x, b);
 	getXAxisMatrix();
 	getYAxisMatrix();
-	cout<<endl;
-	printMatrixx(x_axis);
-	cout<<endl;
-	printMatrixx(y_axis);
-	cout<<endl;
+	normalize();
+
 	plotpy::Plot2d<T> plt;
 
 	plt.initialize(1);
@@ -168,10 +166,6 @@ void PathFinder<T>::getNodeEquations(int initialRow, int initialCol, int finalRo
 			finalPosition = (finalCol - 1) + this->imgCols * finalRow;
 		}
 	}
-
-	cout <<"flag"<<flag<<endl;
-	cout <<"ip"<<initialPosition<<endl;
-	cout <<"fp"<<finalPosition<<endl;
 
 	b.at(initialPosition) = 1;
 	b.at(finalPosition) = -1;
@@ -308,24 +302,19 @@ void PathFinder<T>::getXAxisMatrix(){
 				{
 					position = 0;
 					xl = xr = 0;
-					
 					//Left current
 					if(j > 0){
 						position = indexMap->getXFromNodes(i,j,i,j-1);
-						xl = abs(x[position]);
+						xl = x[position];
 					}
-
 					//Right current
 					if(j < this->imgCols-1){
 						position = indexMap->getXFromNodes(i,j,i,j+1);
-						xr = abs(x[position]);
+						xr = x[position];
 					}
-					cout << i << " "<< j<<endl;
-					cout << xl << " " <<xr<<endl;
-					this->x_axis[i][j] = xl - xr; 
+					this->x_axis[i][j] = -(xr + xl) ; 
 				}
 			}
-		//normalize(x_axis);
 }
 
 template<typename T>
@@ -338,40 +327,40 @@ void PathFinder<T>::getYAxisMatrix(){
 				{
 					position = 0;
 					yu = yb = 0;
-					
 					//Down current
 					if(i < this->imgRows-1){
 						position = indexMap->getXFromNodes(i,j,i+1,j);
 						yb = x[position];
 					}
-
 					//Up current
 					if(i > 0){
 						position = indexMap->getXFromNodes(i,j,i-1,j);
 						yu = x[position];
 					}
-					
-					this->y_axis[i][j] = yu + yb; 		
+					this->y_axis[i][j] = (yu + yb); 		
 				}
 			}
-			//normalize(y_axis);
 }
 
 
 template<typename T>
-void PathFinder<T>::normalize(Matrix<T> &m){
-	T big, tmp;
-	for(int i = 0; i < m.rows(); i++){
-			big = T(0);
-			for(int j = 0; j < m.cols(); j++){
-				if((tmp = abs(m(i, j))) > big)
+void PathFinder<T>::normalize(){
+	T big, tmp = T(0);
+	for (int i = 0; i < imgRows; i++){
+		for(int j = 0; j < imgCols; j++){
+			tmp = sqrt(x_axis(i,j)*x_axis(i,j)+y_axis(i,j)*y_axis(i,j));
+			if(tmp > big){
 					big = tmp;
-				cout << "big " << big<<endl;
-			}
-			for(int j = 0; j < m.cols(); j++){
-				m(i,j)=m(i,j)/big;
 			}
 		}
+	}
+	
+	for(int i = 0; i < imgRows; i++){
+		for(int j = 0; j < imgCols; j++){
+			x_axis(i,j)=x_axis(i,j)/big;
+			y_axis(i,j)=y_axis(i,j)/big;
+		}
+	}
 }
 
 

@@ -122,10 +122,9 @@ inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 	}
 }
 
-/*template<>
+template<>
 inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		Matrix<float>& LU) {
-	cout << "CULO" << endl;
 	this->n = A.rows();
 	if(this->n != A.cols())
 		throw runtime_error("'A' matrix is not square in method: void lu(const Matrix<T>& A, Matrix<T>& LU)");
@@ -182,7 +181,7 @@ inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		}
 
 	}
-}*/
+}
 
 /**
  * @brief Solves an systems of linear equations by LU decomposition.
