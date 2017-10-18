@@ -397,6 +397,9 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 	int position = 0;
 	int nextX = 0;
 	int nextY = 0;
+
+	points->push_back(Point(actualRow,actualCol)); //Initial node
+	
 	
 	while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
 		maxCurrent = 0;
