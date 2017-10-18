@@ -1,13 +1,23 @@
 # CE3202-Project2-PathFinder
 Project for the course Numerical Analysis of the Costa Rica Institute of Technology
 
-Compile instructions
+## Compile instructions
 
 SIMD enable compile:
-cmake CMakelists.txt
+
+```sh
+$ cmake CMakelists.txt
+```
 
 SIMD disable compile:
-cmake CMakelists.txt -DIS_SIMD_ACTIVE=OFF
 
-OpenCV Install
-https://www.learnopencv.com/install-opencv3-on-ubuntu/
+```sh
+$ cmake CMakelists.txt -DIS_SIMD_ACTIVE=OFF
+```
+
+OpenCV Install:
+
+* [Tutorial]
+
+
+[Tutorial]: <https://www.learnopencv.com/install-opencv3-on-ubuntu/>
