@@ -121,6 +121,10 @@ int main() {
 	Matrix<float> M3 = M2 - M;
 	M3(4,4) = 7;
 	printMatrix(M3);*
+<<<<<<< HEAD
+=======
+
+>>>>>>> aaa4b5ef47513b089bdf29e3e63311a1404f83e1
 	//Index mapping example
 	IndexMap * indexMap = new IndexMap(4,4); //Mapping 4x4 matrix
 	cout << indexMap->getXFromNodes(3,1,3,2)<<endl; //Get index of x between 31 and 32 nodes

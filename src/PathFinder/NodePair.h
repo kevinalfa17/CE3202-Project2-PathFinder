@@ -23,7 +23,7 @@ private:
 
 public:
 	void setNodes(int node1row, int node1col, int node2row, int node2col);
-
+	void getNextNode(int actualRow, int actualCol, int & nextRow, int & nextCol);
 	NodePair(int node1row, int node1col, int node2row, int node2col);
 
 	void printPair();
@@ -108,6 +108,17 @@ void NodePair::printPair(){
 
 	std::cout <<firstNodeRow<<firstNodeCol<<","<<secondNodeRow<<secondNodeCol<<std::endl;
 
+}
+
+void NodePair::getNextNode(int actualRow, int actualCol, int & nextRow, int & nextCol){
+	if(actualRow == firstNodeRow && actualCol == firstNodeCol){
+		nextRow = secondNodeRow;
+		nextCol = secondNodeCol;
+	}
+	else{
+		nextRow = firstNodeRow;
+		nextCol = firstNodeCol;
+	}
 }
 
 
