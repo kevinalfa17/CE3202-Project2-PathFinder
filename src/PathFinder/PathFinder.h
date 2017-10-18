@@ -34,6 +34,9 @@ private:
 	int rows;
 	int cols;
 
+	Matrix<T> x_axis;
+	Matrix<T> y_axis;
+
 	//Image matrix
 	Mat imageMatrix;
 	int imgRows;
@@ -210,6 +213,34 @@ void PathFinder<T>::getMeshEquations(){
 		}
 	}
 
+}
+
+
+template<typename T>
+void PathFinder<T>::getXAxisMatrix(){
+/**
+			//Right current
+			if(j < this->imgCols-1){
+				position = indexMap->getXFromNodes(i,j,i,j+1);
+				A(equation_row,position) = -1;
+			}
+			//Down current
+			if(i < this->imgRows-1){
+				position = indexMap->getXFromNodes(i,j,i+1,j);
+				A(equation_row,position) = -1;
+			}
+
+			//Left current
+			if(j > 0){
+				position = indexMap->getXFromNodes(i,j,i,j-1);
+				A(equation_row,position) = 1;
+			}
+			//Up current
+			if(i > 0){
+				position = indexMap->getXFromNodes(i,j,i-1,j);
+				A(equation_row,position) = 1;
+			}
+*/
 }
 
 #endif /* PATHFINDER_PATHFINDER_H_ */

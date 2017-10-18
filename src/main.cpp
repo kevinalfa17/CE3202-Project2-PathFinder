@@ -16,6 +16,7 @@
 #include <boost/bimap/unordered_set_of.hpp>
 #include <opencv2/opencv.hpp>
 #include "UploadImage.h"
+#include "Matrix/MatrixDescomposition.h"
 
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
@@ -145,12 +146,12 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,0,2,uploadImage->getImage());
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,2,1,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
-	vector<float> x = pathFinder->getX();
-	//printMatrix(A);
-
-
+	vector<float> b = pathFinder->getB();
+	printMatrix(A);
+	printVector(b);
+	
 	vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
 	cout << "[\t";

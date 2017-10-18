@@ -122,7 +122,7 @@ inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 	}
 }
 
-template<>
+/*template<>
 inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		Matrix<float>& LU) {
 	cout << "CULO" << endl;
@@ -182,7 +182,7 @@ inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		}
 
 	}
-}
+}*/
 
 /**
  * @brief Solves an systems of linear equations by LU decomposition.
