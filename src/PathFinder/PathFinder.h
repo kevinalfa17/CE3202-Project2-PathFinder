@@ -272,29 +272,37 @@ void PathFinder<T>::getMeshEquations()
 
 template<typename T>
 void PathFinder<T>::getXAxisMatrix(){
-/**
-			//Right current
-			if(j < this->imgCols-1){
-				position = indexMap->getXFromNodes(i,j,i,j+1);
-				A(equation_row,position) = -1;
-			}
-			//Down current
-			if(i < this->imgRows-1){
-				position = indexMap->getXFromNodes(i,j,i+1,j);
-				A(equation_row,position) = -1;
-			}
+			for (int i = 0; i < this->imgRows; i++)
+			{
+				for (int j = 0; j < this->imgCols; j++)
+				{
+					//Left current
+					if(j > 0){
+						position = indexMap->getXFromNodes(i,j,i,j-1);
+						cout << "Left "<<x(position) <<endl;
+					}
 
-			//Left current
-			if(j > 0){
-				position = indexMap->getXFromNodes(i,j,i,j-1);
-				A(equation_row,position) = 1;
+					//Right current
+					if(j < this->imgCols-1){
+						position = indexMap->getXFromNodes(i,j,i,j+1);
+						cout <<"Rigth "<< x(position) <<endl;
+					}
+
+					/**
+					//Down current
+					if(i < this->imgRows-1){
+						position = indexMap->getXFromNodes(i,j,i+1,j);
+						A(equation_row,position) = -1;
+					}
+
+					//Up current
+					if(i > 0){
+						position = indexMap->getXFromNodes(i,j,i-1,j);
+						A(equation_row,position) = 1;
+					}
+					*/
+				}
 			}
-			//Up current
-			if(i > 0){
-				position = indexMap->getXFromNodes(i,j,i-1,j);
-				A(equation_row,position) = 1;
-			}
-*/
 }
 
 #endif /* PATHFINDER_PATHFINDER_H_ */
