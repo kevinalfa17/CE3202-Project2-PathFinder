@@ -15,6 +15,7 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 #include "UploadImage.h"
 #include "plot/plotpy.h"
 
@@ -135,7 +136,7 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,4,0,uploadImage->getImage());
+	PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
 	vector<float> x = pathFinder->getX();
 	//printMatrix(A);
@@ -162,6 +163,7 @@ int main() {
 			{5,6,8,8,9,8 },
 			{65,4,3,3,4,5}};
 
+			/*
 	plotpy::Plot2d<double> plt;
 
 	plt.initialize(1);
@@ -170,7 +172,16 @@ int main() {
 
 	plt.quiver(mb, ma);
 
-		plt.showallplots();
+	plt.showallplots();
+*/
+	const vector<Point> * points = pathFinder->getPathPoints();
+
+	cout << "[\t";
+	for(int i = 0; i < points->size(); i++){
+		cout <<"("<< points->at(i).x <<","<<points->at(i).y<<")"<<"\t";
+	}
+	cout << "]" << endl;
+
 
 	return 0;
 }
