@@ -110,7 +110,7 @@ void NodePair::printPair(){
 
 }
 
-void getNextNode(int actualRow, int actualCol, int & nextRow, int & nextCol){
+void NodePair::getNextNode(int actualRow, int actualCol, int & nextRow, int & nextCol){
 	if(actualRow == firstNodeRow && actualCol == firstNodeCol){
 		nextRow = secondNodeRow;
 		nextCol = secondNodeCol;
