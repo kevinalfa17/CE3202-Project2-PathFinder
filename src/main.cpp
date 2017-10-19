@@ -139,14 +139,13 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
-	//PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
-	PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
-
+	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,12,13,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
 	vector<float> b = pathFinder->getB();
-	//printMatrix(A);
-	//printVector(b);
+	//PathFinder<float>  * pathFinder = new PathFinder<float>(2,2,7,3,uploadImage->getImage());
 	
+	
+
 	/*vector<float> xx = pathFinder->getX();
 	cout << "Vector size: " << xx.size() << endl;
 	cout << "[\t";
@@ -165,8 +164,6 @@ int main() {
 
 	PathDrawer * pathDrawer = new PathDrawer(uploadImage->getImage());
 	pathDrawer->drawPath(points);
-	
-
 
 	return 0;
 }

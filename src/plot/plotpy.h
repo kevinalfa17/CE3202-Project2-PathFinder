@@ -44,7 +44,6 @@ class  Plot2d{
 		std::string _ylabel;
 		//Tamano de la cuadricula
 		int _sizegrid;
-		
 
 
 	public:
@@ -69,7 +68,7 @@ class  Plot2d{
 
 		void plot(std::vector<T> datax, std::vector<T> datay,std::string label);
 
-        void quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y);
+        void setVecRoute(anpi::Matrix<T> &X, anpi::Matrix<T> &Y, std::vector<T> &xv, std::vector<T> &yv, int id);
 
 		void showallplots();
 
@@ -97,6 +96,8 @@ template <typename T>
 void Plot2d<T>::initialize(int id){
     Py_Initialize();
     PyRun_SimpleString("import matplotlib.pyplot as plt");
+    PyRun_SimpleString("from matplotlib.path import Path");
+    PyRun_SimpleString("import matplotlib.patches as patches");
     std::string tmp1 = "plt.figure("+std::to_string(id)+")"; 
     PyRun_SimpleString(tmp1.c_str());
     _title = "";
@@ -207,18 +208,18 @@ void Plot2d<T>::plot(std::vector<T> datax, std::vector<T> datay, std::string lab
 }
 
 template<typename T>
-void Plot2d<T>::quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y) {
+void Plot2d<T>::setVecRoute(anpi::Matrix<T> &X, anpi::Matrix<T> &Y, std::vector<T> &xv, std::vector<T> &yv, int id) {
 	std::string tmp1 = "datax = [";
 	std::string tmp2 = "datay = [";
     std::string tmp3 = "plt.quiver(datax,datay,units='width')";
 
-	for (int i = X.rows()-1; i >= 0; i--)
+	for (int i = 0; i < X.rows(); i++)
 	{
 		tmp1.append("[");
 		tmp2.append("[");
 		for(int j = 0; j < X.cols(); j++){
 			if(j == X.cols()-1){
-                if(i == 0){
+                if(i == X.rows()-1){
                     tmp1.append(std::to_string(X[i][j]) + "]");
                     tmp2.append(std::to_string(Y[i][j]) + "]");
                 }else{
@@ -234,11 +235,29 @@ void Plot2d<T>::quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y) {
     tmp1.append("]");
     tmp2.append("]");
 
+    std::string tmp4 = "verts = [";
+    std::string tmp5 = "path = Path(verts)";
+
+    for(int i = 0; i < xv.size(); i++){
+    	if(i == xv.size()-1)
+    		tmp4.append("("+std::to_string(xv.at(i))+","+std::to_string(yv.at(i))+")");
+    	else
+    		tmp4.append("("+std::to_string(xv.at(i))+","+std::to_string(yv.at(i))+"),");
+    }
+    tmp4.append("]");
+
+    std::string tmp6 = "ax = plt.figure("+std::to_string(id)+").add_subplot(111)";
     const char * a = tmp1.c_str();
     const char * b = tmp2.c_str();
+    const char * c = tmp4.c_str();
     PyRun_SimpleString(a);
     PyRun_SimpleString(b);
+    PyRun_SimpleString(c);
     PyRun_SimpleString(tmp3.c_str());
+    PyRun_SimpleString(tmp5.c_str());
+    PyRun_SimpleString(tmp6.c_str());
+    PyRun_SimpleString("patch = patches.PathPatch(path, edgecolor='orange' , facecolor='none', lw=5)");
+    PyRun_SimpleString("ax.add_patch(patch)");
     
 }
 

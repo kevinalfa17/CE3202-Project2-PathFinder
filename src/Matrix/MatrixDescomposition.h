@@ -1,7 +1,7 @@
 /**
  * @file MatrixDescomposition.h
- * @brief Class that implements decomposition of matrix method to find equations solutions.
- * @author Daedgomez and Denporras
+ * @brief Class that implements decomposition LU of matrix method to find equations solutions. And uses SIMD to optimize the method of lu.
+ * @author Denporras
  * @date 28 de sep. de 2017
  */
 
@@ -68,7 +68,7 @@ inline MatrixDescomposition<T>::MatrixDescomposition() {
  * @param LU Decomposition of A.
  */
 template<typename T>
-inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
+void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 		Matrix<T>& LU) {
 	this->n = A.rows();
 		if(this->n != A.cols())
@@ -122,10 +122,15 @@ inline void MatrixDescomposition<T>::lu(const Matrix<T>& A,
 	}
 }
 
-/*template<>
-inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
+/**
+ * @brief Lu decomposition with optimization for float
+ * @param A
+ * @param LU
+ */
+template<>
+void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		Matrix<float>& LU) {
-	cout << "CULO" << endl;
+	cout << "Optimized float" << endl;
 	this->n = A.rows();
 	if(this->n != A.cols())
 		throw runtime_error("'A' matrix is not square in method: void lu(const Matrix<T>& A, Matrix<T>& LU)");
@@ -177,12 +182,106 @@ inline void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 			LU[k][k] = SMALL;
 		for(i = k+1;i < this->n; i++){
 			tmp = LU[i][k] /= LU[k][k];
-			for(j= k+1; j < this->n; j++)
-				LU[i][j] -= tmp*LU[k][j];
-		}
+			int var = k+1;
+			if(var%4 != 0){
+				for(j= k+1; j%4 != 0; j++)
+					LU[i][j] -= tmp*LU[k][j];
+				var = j;
+			}
+			if(var < this->n){
+				__m128 * rowsSSE1 = (__m128 *) LU[i];
+				__m128 * rowsSSE2 = (__m128 *) LU[k];
+				float *tmpVec = (float*) calloc(4,  sizeof(float));
+				tmpVec[0] = tmpVec[1] = tmpVec[2] = tmpVec[3] = tmp;
+				__m128 * vecSSE = (__m128 *) tmpVec;
+				for(int y = var; y < LU.dcols(); y+=4)
+					rowsSSE1[y/4] = _mm_sub_ps (rowsSSE1[y/4], _mm_mul_ps(rowsSSE2[y/4],vecSSE[0]));
+				free(tmpVec);
+			}
 
+		}
 	}
-}*/
+}
+
+/**
+ * @brief Lu decomposition with optimization for float
+ * @param A
+ * @param LU
+ */
+template<>
+void MatrixDescomposition<double>::lu(const Matrix<double>& A,
+		Matrix<double>& LU) {
+	this->n = A.rows();
+	if(this->n != A.cols())
+		throw runtime_error("'A' matrix is not square in method: void lu(const Matrix<T>& A, Matrix<T>& LU)");
+	this->index.clear();
+	LU = A;
+
+	const double SMALL = 1.0e-40;
+	int i, i_max, j, k;
+	double big, tmp;
+	vector<double> scaling;
+	for(i = 0; i < this->n; i++){
+		big = double(0);
+		for(j = 0; j < this->n; j++){
+			if((tmp = abs(LU(i, j))) > big)
+				big = tmp;
+		}
+		if(abs(big) < numeric_limits<double>::epsilon()){
+			throw runtime_error("Singular matrix in method: void lu(const Matrix<T>& A, Matrix<T>& LU)");
+		}
+		scaling.push_back(double(1)/big);
+	}
+
+	for(k = 0; k < this->n; k++){
+		big = double(0);
+		for(i = k; i < this->n; i++){
+			tmp = scaling.at(i) * abs(LU(i,k));
+			if(tmp > big){
+				big = tmp;
+				i_max = i;
+			}
+		}
+		if(k != i_max){
+			__m128d * zeroArr = (__m128d *) calloc(2,  sizeof(double));
+			double * tmpData = (double*)calloc(LU.dcols(),sizeof(double));
+			memcpy(tmpData,LU[i_max],sizeof(double)*LU.dcols());
+			__m128d * tmpSSE1 = (__m128d *) tmpData;
+			__m128d * tmpSSE2 = (__m128d *) LU[i_max];
+			__m128d * tmpSSE3 = (__m128d *) LU[k];
+			for(j = 0; j < (LU.dcols()/2); j++){
+				tmpSSE2[j] = _mm_add_pd(tmpSSE3[j],zeroArr[0]);
+				tmpSSE3[j] = _mm_add_pd(tmpSSE1[j],zeroArr[0]);
+			}
+			free(zeroArr);
+			free(tmpData);
+			scaling.at(i_max) = scaling.at(k);
+		}
+		this->index.push_back(i_max);
+		if(abs(LU[k][k]) < numeric_limits<double>::epsilon())
+			LU[k][k] = SMALL;
+		for(i = k+1;i < this->n; i++){
+			tmp = LU[i][k] /= LU[k][k];
+			int var = k+1;
+			if(var%2 != 0){
+				for(j= k+1; j%2 != 0; j++)
+					LU[i][j] -= tmp*LU[k][j];
+				var = j;
+			}
+			if(var < this->n){
+				__m128d * rowsSSE1 = (__m128d *) LU[i];
+				__m128d * rowsSSE2 = (__m128d *) LU[k];
+				double *tmpVec = (double*) calloc(2,  sizeof(double));
+				tmpVec[0] = tmpVec[1] = tmpVec[2] = tmpVec[3] = tmp;
+				__m128d * vecSSE = (__m128d *) tmpVec;
+				for(int y = var; y < LU.dcols(); y+=2)
+					rowsSSE1[y/2] = _mm_sub_pd(rowsSSE1[y/2], _mm_mul_pd(rowsSSE2[y/2],vecSSE[0]));
+				free(tmpVec);
+			}
+
+		}
+	}
+}
 
 /**
  * @brief Solves an systems of linear equations by LU decomposition.

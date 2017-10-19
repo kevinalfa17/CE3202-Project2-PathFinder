@@ -19,6 +19,9 @@
 #include <limits>
 #include <cmath>
 #include "../plot/plotpy.h"
+#include "math.h"
+
+#include <ctime>
 
 using namespace anpi;
 using namespace cv;
@@ -42,6 +45,8 @@ class PathFinder
 
 	Matrix<T> x_axis;
 	Matrix<T> y_axis;
+	vector<T> xPosition;
+	vector<T> yPosition;
 
 	//Image matrix
 	Mat imageMatrix;
@@ -80,7 +85,9 @@ class PathFinder
 	void getMeshEquations();
 	void getXAxisMatrix();
 	void getYAxisMatrix();
-	void normalize(Matrix<T> &m);
+	void normalize();
+	void getPathPositions(T alpha);
+	T bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y);
 };
 
 /**
@@ -125,14 +132,27 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	//Do LU descomposition
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
+
 	getXAxisMatrix();
 	getYAxisMatrix();
+	normalize();
+	getPathPositions(0.1);
+	//printMatrixx(x_axis);
+	//cout<<endl;
+	//printMatrixx(y_axis);
+
 
 	//Plot python graphic for strategy 2
 	plotpy::Plot2d<T> plt;
 	plt.initialize(1);
-	plt.settitle("titulo");
-	plt.quiver(x_axis, y_axis);
+
+	plt.settitle("Path found");
+
+	plt.setVecRoute(x_axis, y_axis,xPosition,yPosition,1);
+
+	plt.setxrange(-1,imgCols+1);
+	plt.setyrange(-1,imgRows+1);
+
 	plt.showallplots();
 
 }
@@ -198,6 +218,7 @@ void PathFinder<T>::getNodeEquations()
 	//Fill the initial (1A) and final (-1A) of b
 	this->b.at(initialPosition) = 1;
 	this->b.at(finalPosition) = -1;
+
 
 	for (int i = 0; i < this->imgRows; i++)
 	{
@@ -334,24 +355,19 @@ void PathFinder<T>::getXAxisMatrix(){
 				{
 					position = 0;
 					xl = xr = 0;
-					
 					//Left current
 					if(j > 0){
 						position = indexMap->getXFromNodes(i,j,i,j-1);
-						xl = abs(x[position]);
+						xl = x[position];
 					}
-
 					//Right current
 					if(j < this->imgCols-1){
 						position = indexMap->getXFromNodes(i,j,i,j+1);
-						xr = abs(x[position]);
+						xr = x[position];
 					}
-					cout << i << " "<< j<<endl;
-					cout << xl << " " <<xr<<endl;
-					this->x_axis[i][j] = xl - xr; 
+					this->x_axis[i][j] = -(xr + xl) ; 
 				}
 			}
-		//normalize(x_axis);
 }
 
 template<typename T>
@@ -364,40 +380,40 @@ void PathFinder<T>::getYAxisMatrix(){
 				{
 					position = 0;
 					yu = yb = 0;
-					
 					//Down current
 					if(i < this->imgRows-1){
 						position = indexMap->getXFromNodes(i,j,i+1,j);
 						yb = x[position];
 					}
-
 					//Up current
 					if(i > 0){
 						position = indexMap->getXFromNodes(i,j,i-1,j);
 						yu = x[position];
 					}
-					
-					this->y_axis[i][j] = yu + yb; 		
+					this->y_axis[i][j] = -(yu + yb); 		
 				}
 			}
-			//normalize(y_axis);
 }
 
 
 template<typename T>
-void PathFinder<T>::normalize(Matrix<T> &m){
-	T big, tmp;
-	for(int i = 0; i < m.rows(); i++){
-			big = T(0);
-			for(int j = 0; j < m.cols(); j++){
-				if((tmp = abs(m(i, j))) > big)
+void PathFinder<T>::normalize(){
+	T big, tmp = T(0);
+	for (int i = 0; i < imgRows; i++){
+		for(int j = 0; j < imgCols; j++){
+			tmp = sqrt(x_axis(i,j)*x_axis(i,j)+y_axis(i,j)*y_axis(i,j));
+			if(tmp > big){
 					big = tmp;
-				cout << "big " << big<<endl;
-			}
-			for(int j = 0; j < m.cols(); j++){
-				m(i,j)=m(i,j)/big;
 			}
 		}
+	}
+	
+	for(int i = 0; i < imgRows; i++){
+		for(int j = 0; j < imgCols; j++){
+			x_axis(i,j)=x_axis(i,j)/big;
+			y_axis(i,j)=y_axis(i,j)/big;
+		}
+	}
 }
 
 /**
@@ -421,8 +437,9 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 
 	points->push_back(Point(actualRow,actualCol)); //Initial node
 	
-	
+	//int i = 0;
 	while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
+		//while (i < 60){
 		maxCurrent = 0;
 
 		//Right current
@@ -478,10 +495,84 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		actualRow = nextX;
 		actualCol = nextY;
 		points->push_back(Point(nextX,nextY));
+		std::cout<<"("<<nextX<<","<<nextY<<")"<<std::endl;
 
+		//i++;
 	}//End while
 	return points;
 
 }
+
+template <typename T>
+void  PathFinder<T>::getPathPositions(T alpha)
+{
+	T row = this->initialRow;
+	T col = this->initialCol;
+	T tmpRow, tmpCol;
+	this->xPosition.push_back(row);
+	this->yPosition.push_back(col);
+	
+	tmpRow = row + alpha * x_axis(row,col);
+	tmpCol = col + alpha * y_axis(row,col);
+	
+	
+	while (row != this->finalCol or col != this->finalRow){
+	//for (int i = 0; i<100;i++){
+		if (col>=imgRows-1){
+			col = col-1;
+		}
+
+		if (row>=imgCols-1){
+			row = row-1;
+		}
+
+		if (col<0){
+			col = 0;
+		}
+
+		if (row<0){
+			row = 0;
+		}
+
+		T q11x = x_axis(col,row);
+		T q12x = x_axis(col,row+1);
+		T q21x = x_axis(col+1,row);
+		T q22x = x_axis(col+1,row+1);
+		T dx = bilinearInterpolation(q11x,q12x,q21x,q22x,col,col+1,row,row+1,tmpCol,tmpRow);
+		T q11y = y_axis(col,row);
+		T q12y = y_axis(col,row+1);
+		T q21y = y_axis(col+1,row);
+		T q22y = y_axis(col+1,row+1);
+		T dy = bilinearInterpolation(q11y,q12y,q21y,q22y,col,col+1,row,row+1,tmpCol,tmpRow);
+		tmpRow = tmpRow + alpha * dx;
+		tmpCol = tmpCol + alpha * dy;
+		this->xPosition.push_back(tmpRow);
+		this->yPosition.push_back(tmpCol);
+		row = floor(tmpRow);
+		col = floor(tmpCol);
+		
+	}
+}
+
+template <typename T>
+T PathFinder<T>::bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y) 
+{
+    T x2x1, y2y1, x2x, y2y, yy1, xx1, x1x2,y1y2;
+    x2x1 = x2 - x1;
+    y2y1 = y2 - y1;
+    x1x2 = -x2x1;
+    y1y2 = -y2y1;
+    x2x = x2 - x;
+    y2y = y2 - y;
+    yy1 = y - y1;
+    xx1 = x - x1;
+    return 1.0 / (x2x1 * y2y1) * (
+        q11 * x2x * y2y +
+        q21 * xx1 * y2y +
+        q12 * x2x * yy1 +
+        q22 * xx1 * yy1
+    );
+}
+
 
 #endif /* PATHFINDER_PATHFINDER_H_ */
