@@ -212,13 +212,13 @@ void Plot2d<T>::quiver(anpi::Matrix<T> &X, anpi::Matrix<T> &Y) {
 	std::string tmp2 = "datay = [";
     std::string tmp3 = "plt.quiver(datax,datay,units='width')";
 
-	for (int i = X.rows()-1; i >= 0; i--)
+	for (int i = 0; i < X.rows(); i++)
 	{
 		tmp1.append("[");
 		tmp2.append("[");
 		for(int j = 0; j < X.cols(); j++){
 			if(j == X.cols()-1){
-                if(i == 0){
+                if(i == X.rows()-1){
                     tmp1.append(std::to_string(X[i][j]) + "]");
                     tmp2.append(std::to_string(Y[i][j]) + "]");
                 }else{

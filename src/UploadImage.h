@@ -27,11 +27,9 @@ public:
 UploadImage::UploadImage() {
 }
 void UploadImage::upload() {
-<<<<<<< HEAD
-	   this->image = imread( "Ruta.png", 0 ); // Read the file
-=======
-	   this->image = imread( "Ruta6x8.png", 0 ); // Read the file
->>>>>>> c253def8323c6ab0898f4ada826879f8c4c8c3d8
+
+	   this->image = imread( "Ruta3x3.png", 0 ); // Read the file
+
 			      /**
 			       namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
 			       cout << image<< endl;

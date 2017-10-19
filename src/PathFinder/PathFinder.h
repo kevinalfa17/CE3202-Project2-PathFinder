@@ -42,6 +42,8 @@ class PathFinder
 
 	Matrix<T> x_axis;
 	Matrix<T> y_axis;
+	vector<T> xPosition;
+	vector<T> yPosition;
 
 	//Image matrix
 	Mat imageMatrix;
@@ -80,6 +82,8 @@ class PathFinder
 	void getXAxisMatrix();
 	void getYAxisMatrix();
 	void normalize();
+	void getPathPositions(T alpha);
+	T bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y);
 };
 
 template <typename T>
@@ -113,12 +117,16 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	getXAxisMatrix();
 	getYAxisMatrix();
 	normalize();
+	getPathPositions(1);
+	printMatrixx(x_axis);
+	cout<<endl;
+	printMatrixx(y_axis);
 
 	plotpy::Plot2d<T> plt;
 
 	plt.initialize(1);
 
-	plt.settitle("titulo");
+	plt.settitle("Path found");
 
 	plt.quiver(x_axis, y_axis);
 
@@ -352,7 +360,7 @@ void PathFinder<T>::getYAxisMatrix(){
 						position = indexMap->getXFromNodes(i,j,i-1,j);
 						yu = x[position];
 					}
-					this->y_axis[i][j] = (yu + yb); 		
+					this->y_axis[i][j] = -(yu + yb); 		
 				}
 			}
 }
@@ -457,5 +465,63 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 	return points;
 
 }
+
+template <typename T>
+void  PathFinder<T>::getPathPositions(T alpha)
+{
+	T row = this->initialRow;
+	T col = this->initialCol;
+	T tmpRow, tmpCol;
+	this->xPosition.push_back(row);
+	this->yPosition.push_back(col);
+	tmpRow = row + alpha * x_axis(row,col);
+	tmpCol = col + alpha * y_axis(row,col);
+		
+	
+	//while (row != this.finalRow and col != this.finalCol){
+	for (int i = 0; i<5;i++){
+		T q11x = x_axis(row,col);
+		T q12x = x_axis(row,col+1);
+		T q21x = x_axis(row+1,col);
+		T q22x = x_axis(row+1,col+1);
+		T dx = bilinearInterpolation(q11x,q12x,q21x,q22x,col,col+1,row,row+1,tmpCol,tmpRow);
+		T q11y = y_axis(row,col);
+		T q12y = y_axis(row,col+1);
+		T q21y = y_axis(row+1,col);
+		T q22y = y_axis(row+1,col+1);
+		T dy = bilinearInterpolation(q11y,q12y,q21y,q22y,col,col+1,row,row+1,tmpCol,tmpRow);
+		cout << dx<<" "<<dy <<endl;
+		tmpRow = tmpRow + alpha * dx;
+		tmpCol = tmpCol + alpha * dy;
+		cout << tmpRow<<" saddas "<<tmpCol <<endl;
+		this->xPosition.push_back(tmpRow);
+		this->yPosition.push_back(tmpCol);
+		row = floor(tmpRow);
+		col = floor(tmpCol);
+		//cout << "x " << x_axis(row,col) << " y " <<y_axis(row,col)<<endl;
+		//cout << "row " <<row << " col "<<col<<endl;
+	}
+}
+
+template <typename T>
+T PathFinder<T>::bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y) 
+{
+    T x2x1, y2y1, x2x, y2y, yy1, xx1, x1x2,y1y2;
+    x2x1 = x2 - x1;
+    y2y1 = y2 - y1;
+    x1x2 = -x2x1;
+    y1y2 = -y2y1;
+    x2x = x2 - x;
+    y2y = y2 - y;
+    yy1 = y - y1;
+    xx1 = x - x1;
+    return 1.0 / (x2x1 * y2y1) * (
+        q11 * x2x * y2y +
+        q21 * xx1 * y2y +
+        q12 * x2x * yy1 +
+        q22 * xx1 * yy1
+    );
+}
+
 
 #endif /* PATHFINDER_PATHFINDER_H_ */
