@@ -342,7 +342,7 @@ TEST(IndexMap, TwoSidesIntegrity){
     int i = indexMap->getXFromNodes(r1,c1,r2,c2);
    
 
-    ASSERT_EQ(i , 3) << "Wrong nodes to current"; 
+    ASSERT_EQ(i , 3) << "Wrong integrity"; 
 
 
 }

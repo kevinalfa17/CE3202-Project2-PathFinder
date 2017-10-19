@@ -3,6 +3,8 @@
  * Área Académica de Ingeniería en Computadoras, ITCR, Costa Rica
  *
  * This file is part of the numerical analysis lecture CE3102 at TEC
+ * 
+ * Modified by Kevin Alfaro
  */
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE) 
@@ -12,6 +14,7 @@ namespace anpi
 // Implementation of Matrix
 // ------------------------
 
+//Default constructor
 template<typename T>
 Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0),_dcols(0) {}
 
@@ -20,6 +23,7 @@ Matrix<T>::Matrix() : _data(0),_rows(0),_cols(0),_dcols(0) {}
 template<typename T>
 Matrix<T>::Matrix(const size_t r, const size_t c, const InitializationType type): _data(0),_rows(0),_cols(0),_dcols(0) {
 	
+	//Check if is normal or padded initialization
 	switch(type){
 	case DoNotInitialize:
 		if(((sizeof(T)*c)/16) != 1 || (r*c)%(16/sizeof(T)) != 0){
@@ -63,8 +67,6 @@ Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(
 	}
 }
 
-
-
 //Copy constructor (Deep copy)
 template<typename T>
 Matrix<T>::Matrix(const Matrix<T>& other): Matrix(other._rows,other._cols,Padded) {
@@ -90,7 +92,7 @@ Matrix<T>::~Matrix() {
 	_dcols=0;
 }
 
-
+//Swap between matrix
 template<typename T>
 void Matrix<T>::swap(Matrix<T>& other) {
 	std::swap(_data,other._data);
@@ -99,7 +101,7 @@ void Matrix<T>::swap(Matrix<T>& other) {
 	std::swap(_dcols,other._dcols);
 }
 
-
+//Allocale memory in normal way
 template<typename T>
 void Matrix<T>::allocate(const size_t r, const size_t c) {
 
@@ -117,6 +119,7 @@ void Matrix<T>::allocate(const size_t r, const size_t c) {
 	}
 }
 
+//Allocate memory With padding technique
 template<typename T>
 void Matrix<T>::padded_allocate(const size_t r, const size_t c) {
 
@@ -671,7 +674,7 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 
 }
 
-//Memory liberation
+//This function free allocated memory
 template<typename T>
 void Matrix<T>::deallocate() {
 	delete[] _data;
@@ -874,8 +877,6 @@ Matrix<T>& Matrix<T>::operator-=(const Matrix<T>& other) {
 	return *this;
 }
 
-
-
 template<class T>
 Matrix<T> operator+(const Matrix<T>& a,
 		const Matrix<T>& b) {
@@ -944,6 +945,7 @@ Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
 
 }
 
+//This function free allocated memory
 template<typename T>
 void Matrix<T>::deallocate() {
 	delete[] _data;
