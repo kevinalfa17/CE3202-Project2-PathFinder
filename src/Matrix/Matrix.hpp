@@ -3,6 +3,8 @@
  * Área Académica de Ingeniería en Computadoras, ITCR, Costa Rica
  *
  * This file is part of the numerical analysis lecture CE3102 at TEC
+ * 
+ * Modified by Kevin Alfaro
  */
 
 #ifndef _ANPI_MATRIX_HPP
@@ -21,9 +23,6 @@
 #include "MatrixException.hpp"
 #include "PaddingWarningException.hpp"
 #include <iostream>
-
-
-
 #include <initializer_list>
 
 
@@ -52,11 +51,12 @@ namespace anpi
      */
     enum InitializationType {
       DoNotInitialize,
-	  Padded
+	    Padded
     };
 
-
-    /// Construct an empty matrix
+    /**
+     * Construct by default
+     */
     Matrix();
 
     /**
@@ -139,9 +139,6 @@ namespace anpi
     /// Return pointer to a given row
     inline T* operator[](const size_t row) {return _data + row*_dcols;}
 
-    /// Return read-only pointer to a given row
-    //const T* operator[](const size_t row) const {return _data + row*_dcols;}
-
     /// Return reference to the element at the r row and c column
     T& operator()(const size_t row,const size_t col) {
     	assert(col<_cols && row<_rows);
@@ -185,11 +182,9 @@ namespace anpi
     void standard_fill(const T val);
 
     /**
-     * Allocate memory for the given number of rows and cols
+     * Allocate memory for the given number of rows and cols with padding technique
      */
-    void padded_allocate(const size_t row,
-    		const size_t col);
-
+    void padded_allocate(const size_t row,const size_t col);
 
     /**
      * Check if the matrix is empty (zero rows or columns)
@@ -243,7 +238,6 @@ namespace anpi
     Matrix& operator-=(const Matrix& other);
 
     //@}
-
 
   }; // class Matrix
 
