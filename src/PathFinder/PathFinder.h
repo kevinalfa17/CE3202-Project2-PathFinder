@@ -117,7 +117,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	getXAxisMatrix();
 	getYAxisMatrix();
 	normalize();
-	getPathPositions(1);
+	getPathPositions(0.1);
 	printMatrixx(x_axis);
 	cout<<endl;
 	printMatrixx(y_axis);
@@ -128,7 +128,10 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	plt.settitle("Path found");
 
-	plt.quiver(x_axis, y_axis);
+	plt.setVecRoute(x_axis, y_axis,xPosition,yPosition,1);
+
+	plt.setxrange(-1,imgCols+1);
+	plt.setyrange(-1,imgRows+1);
 
 	plt.showallplots();
 
@@ -474,32 +477,54 @@ void  PathFinder<T>::getPathPositions(T alpha)
 	T tmpRow, tmpCol;
 	this->xPosition.push_back(row);
 	this->yPosition.push_back(col);
+	cout <<"xa "<<x_axis(row,col) << " ya " <<y_axis(row,col)<<endl;
 	tmpRow = row + alpha * x_axis(row,col);
 	tmpCol = col + alpha * y_axis(row,col);
-		
+	cout <<"xi " <<tmpRow<<" yi "<<tmpCol <<endl;
 	
-	//while (row != this.finalRow and col != this.finalCol){
-	for (int i = 0; i<5;i++){
-		T q11x = x_axis(row,col);
-		T q12x = x_axis(row,col+1);
-		T q21x = x_axis(row+1,col);
-		T q22x = x_axis(row+1,col+1);
+	while (row != this->finalCol or col != this->finalRow){
+	//for (int i = 0; i<100;i++){
+		if (col>=imgRows-1){
+			col = col-1;
+		}
+
+		if (row>=imgCols-1){
+			row = row-1;
+		}
+
+		if (col<0){
+			col = 0;
+		}
+
+		if (row<0){
+			row = 0;
+		}
+
+		cout << "row " << row << " col " << col<<endl;
+		T q11x = x_axis(col,row);
+		T q12x = x_axis(col,row+1);
+		T q21x = x_axis(col+1,row);
+		T q22x = x_axis(col+1,row+1);
+		cout << " q11x " << q11x << " qi2x " << q12x << " q21x " << q21x << " q22x " << q22x << " col "<<col<< " row " << " tmpcol "<<tmpCol<< " tmpRow " <<tmpRow<<endl;
 		T dx = bilinearInterpolation(q11x,q12x,q21x,q22x,col,col+1,row,row+1,tmpCol,tmpRow);
-		T q11y = y_axis(row,col);
-		T q12y = y_axis(row,col+1);
-		T q21y = y_axis(row+1,col);
-		T q22y = y_axis(row+1,col+1);
+		T q11y = y_axis(col,row);
+		T q12y = y_axis(col,row+1);
+		T q21y = y_axis(col+1,row);
+		T q22y = y_axis(col+1,row+1);
 		T dy = bilinearInterpolation(q11y,q12y,q21y,q22y,col,col+1,row,row+1,tmpCol,tmpRow);
-		cout << dx<<" "<<dy <<endl;
+		cout << "dx "<<dx<<" dy "<<dy <<endl;
 		tmpRow = tmpRow + alpha * dx;
 		tmpCol = tmpCol + alpha * dy;
-		cout << tmpRow<<" saddas "<<tmpCol <<endl;
+		cout <<"xi " <<tmpRow<<" yi "<<tmpCol <<endl;
 		this->xPosition.push_back(tmpRow);
 		this->yPosition.push_back(tmpCol);
 		row = floor(tmpRow);
+		cout << "row " <<row<<endl;
+		cout << imgRows<<endl;
+		cout << imgCols<<endl;
 		col = floor(tmpCol);
-		//cout << "x " << x_axis(row,col) << " y " <<y_axis(row,col)<<endl;
-		//cout << "row " <<row << " col "<<col<<endl;
+		cout << "floory " << row << " floorx " << col<<endl;
+		
 	}
 }
 
