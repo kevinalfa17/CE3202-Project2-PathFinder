@@ -49,7 +49,7 @@ Matrix<T>::Matrix(const size_t r,  const size_t c, const T *const initMem,const 
 
 //Initialization with initializer list
 template<typename T>
-Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(lst.size(),(lst.size()>0) ? lst.begin()->size() : 0,Padded)
+Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(lst.size(),(lst.size()>0) ? lst.begin()->size() : 0, T(0),Padded)
 {
 	size_t j = 0;
 	for (const auto& r : lst) {
@@ -67,7 +67,7 @@ Matrix<T>::Matrix(std::initializer_list< std::initializer_list<T> > lst):Matrix(
 
 //Copy constructor (Deep copy)
 template<typename T>
-Matrix<T>::Matrix(const Matrix<T>& other): Matrix(other._rows,other._cols,DoNotInitialize) {
+Matrix<T>::Matrix(const Matrix<T>& other): Matrix(other._rows,other._cols,Padded) {
 	fill(other.data());
 }
 
@@ -216,7 +216,9 @@ void Matrix<T>::fill(const T val) {
 //Memcpy fill
 template<typename T>
 void Matrix<T>::fill(const T* mem) {
+	
 	std::memcpy(_data,mem,sizeof(T)*_rows*_dcols);
+
 }
 
 //Standard fill
