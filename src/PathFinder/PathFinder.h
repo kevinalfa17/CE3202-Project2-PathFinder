@@ -121,9 +121,6 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	getYAxisMatrix();
 	normalize();
 	getPathPositions(0.1);
-	printMatrixx(x_axis);
-	cout<<endl;
-	printMatrixx(y_axis);
 
 	plotpy::Plot2d<T> plt;
 

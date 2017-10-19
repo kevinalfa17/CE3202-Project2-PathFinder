@@ -207,6 +207,15 @@ void Plot2d<T>::plot(std::vector<T> datax, std::vector<T> datay, std::string lab
     PyRun_SimpleString("plt.legend()");
 }
 
+/**
+ * @brief  Method that plot a slop field and trace a path, with MATPLOTLIB in Python
+ *
+ * @param X x components matrix
+ * @param Y y components matrix
+ * @param xv x points paths
+ * @param yv y points paths
+ * @param id number of the plot
+ */
 template<typename T>
 void Plot2d<T>::setVecRoute(anpi::Matrix<T> &X, anpi::Matrix<T> &Y, std::vector<T> &xv, std::vector<T> &yv, int id) {
 	std::string tmp1 = "datax = [";

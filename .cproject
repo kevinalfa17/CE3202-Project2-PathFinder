@@ -112,7 +112,11 @@
 			<resource resourceType="PROJECT" workspacePath="/CE3202-Project2-PathFinder"/>
 		</configuration>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings">
+		<doc-comment-owner id="org.eclipse.cdt.ui.doxygen">
+			<path value=""/>
+		</doc-comment-owner>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.release.1091671673;cdt.managedbuild.config.gnu.cross.exe.release.1091671673.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1083436890;cdt.managedbuild.tool.gnu.cpp.compiler.input.1235707934">
