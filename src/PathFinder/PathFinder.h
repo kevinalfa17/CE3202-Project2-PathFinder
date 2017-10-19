@@ -20,6 +20,8 @@
 #include "../plot/plotpy.h"
 #include "math.h"
 
+#include <ctime>
+
 using namespace anpi;
 using namespace cv;
 using namespace std;
@@ -110,11 +112,12 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
+
 	getXAxisMatrix();
 	getYAxisMatrix();
 	normalize();
 
-	plotpy::Plot2d<T> plt;
+	/*plotpy::Plot2d<T> plt;
 
 	plt.initialize(1);
 
@@ -122,7 +125,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	plt.quiver(x_axis, y_axis);
 
-	plt.showallplots();
+	plt.showallplots();*/
 
 }
 
