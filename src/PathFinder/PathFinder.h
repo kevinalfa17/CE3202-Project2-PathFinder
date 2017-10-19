@@ -20,6 +20,8 @@
 #include "../plot/plotpy.h"
 #include "math.h"
 
+#include <ctime>
+
 using namespace anpi;
 using namespace cv;
 using namespace std;
@@ -114,6 +116,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
+
 	getXAxisMatrix();
 	getYAxisMatrix();
 	normalize();
@@ -477,10 +480,10 @@ void  PathFinder<T>::getPathPositions(T alpha)
 	T tmpRow, tmpCol;
 	this->xPosition.push_back(row);
 	this->yPosition.push_back(col);
-	cout <<"xa "<<x_axis(row,col) << " ya " <<y_axis(row,col)<<endl;
+	
 	tmpRow = row + alpha * x_axis(row,col);
 	tmpCol = col + alpha * y_axis(row,col);
-	cout <<"xi " <<tmpRow<<" yi "<<tmpCol <<endl;
+	
 	
 	while (row != this->finalCol or col != this->finalRow){
 	//for (int i = 0; i<100;i++){
@@ -500,30 +503,22 @@ void  PathFinder<T>::getPathPositions(T alpha)
 			row = 0;
 		}
 
-		cout << "row " << row << " col " << col<<endl;
 		T q11x = x_axis(col,row);
 		T q12x = x_axis(col,row+1);
 		T q21x = x_axis(col+1,row);
 		T q22x = x_axis(col+1,row+1);
-		cout << " q11x " << q11x << " qi2x " << q12x << " q21x " << q21x << " q22x " << q22x << " col "<<col<< " row " << " tmpcol "<<tmpCol<< " tmpRow " <<tmpRow<<endl;
 		T dx = bilinearInterpolation(q11x,q12x,q21x,q22x,col,col+1,row,row+1,tmpCol,tmpRow);
 		T q11y = y_axis(col,row);
 		T q12y = y_axis(col,row+1);
 		T q21y = y_axis(col+1,row);
 		T q22y = y_axis(col+1,row+1);
 		T dy = bilinearInterpolation(q11y,q12y,q21y,q22y,col,col+1,row,row+1,tmpCol,tmpRow);
-		cout << "dx "<<dx<<" dy "<<dy <<endl;
 		tmpRow = tmpRow + alpha * dx;
 		tmpCol = tmpCol + alpha * dy;
-		cout <<"xi " <<tmpRow<<" yi "<<tmpCol <<endl;
 		this->xPosition.push_back(tmpRow);
 		this->yPosition.push_back(tmpCol);
 		row = floor(tmpRow);
-		cout << "row " <<row<<endl;
-		cout << imgRows<<endl;
-		cout << imgCols<<endl;
 		col = floor(tmpCol);
-		cout << "floory " << row << " floorx " << col<<endl;
 		
 	}
 }
