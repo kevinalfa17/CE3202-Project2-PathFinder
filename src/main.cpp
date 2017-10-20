@@ -139,6 +139,7 @@ int main() {
 
 	//PathFinder
 	uploadImage->upload();
+
 	PathFinder<float>  * pathFinder = new PathFinder<float>(0,0,12,13,uploadImage->getImage());
 	Matrix<float> A = pathFinder->getA();
 	vector<float> b = pathFinder->getB();

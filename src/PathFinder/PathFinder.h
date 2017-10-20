@@ -27,7 +27,9 @@ using namespace anpi;
 using namespace cv;
 using namespace std;
 
+
 template <typename T>
+
 class PathFinder
 {
   private:
@@ -138,9 +140,6 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	getYAxisMatrix();
 	normalize();
 	getPathPositions(0.1);
-	//printMatrixx(x_axis);
-	//cout<<endl;
-	//printMatrixx(y_axis);
 
 
 	//Plot python graphic for strategy 2
@@ -347,6 +346,10 @@ void PathFinder<T>::getMeshEquations()
 
 }
 
+
+/**
+ * @brief Adds the horizontal currents of each node and places them in an array
+ */
 template<typename T>
 void PathFinder<T>::getXAxisMatrix(){
 			int position;
@@ -372,6 +375,10 @@ void PathFinder<T>::getXAxisMatrix(){
 			}
 }
 
+
+/**
+ * @brief Adds the vertical currents of each node and places them in an array
+ */
 template<typename T>
 void PathFinder<T>::getYAxisMatrix(){
 			int position;
@@ -398,6 +405,9 @@ void PathFinder<T>::getYAxisMatrix(){
 }
 
 
+/**
+ * @brief Normalize the x and y matrix.
+ */
 template<typename T>
 void PathFinder<T>::normalize(){
 	T big, tmp = T(0);
@@ -505,6 +515,10 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 
 }
 
+/**
+ * @brief Paint the path that is obtained by the vector field.
+ * @param alpha scales the displacement vector.
+*/
 template <typename T>
 void  PathFinder<T>::getPathPositions(T alpha)
 {
@@ -556,6 +570,10 @@ void  PathFinder<T>::getPathPositions(T alpha)
 	}
 }
 
+/**
+ * @brief This function implements the bilinear interpolation to get the value of the function of x and y.
+ * @return the x or y component of the bilinear interpolation 
+*/
 template <typename T>
 T PathFinder<T>::bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y) 
 {
