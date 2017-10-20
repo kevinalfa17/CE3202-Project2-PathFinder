@@ -1,8 +1,9 @@
 /*
- * PathFinder.h
- *
+ *  PathFinder.h
+ *	This class creates and fill the A matrix, b vector and x vector with node equations and mesh equations
+ * 
  *  Created on: 8 de oct. de 2017
- *      Author: kevin
+ *  Author: kevin
  */
 
 #ifndef PATHFINDER_PATHFINDER_H_
@@ -26,7 +27,9 @@ using namespace anpi;
 using namespace cv;
 using namespace std;
 
+
 template <typename T>
+
 class PathFinder
 {
   private:
@@ -61,6 +64,7 @@ class PathFinder
   public:
 	PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map);
 
+	//Getters
 	const Matrix<T> &getA() const
 	{
 		return A;
@@ -88,32 +92,46 @@ class PathFinder
 	T bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y);
 };
 
+/**
+ * @brief Constructor by default
+ * @param initialRow row of the start node
+ * @param initialCol col of the start node
+ * @param finalRow row of the end node
+ * @param finalCol col of the end node
+ * @param map Image to process
+ */
 template <typename T>
 PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int finalCol, Mat map)
 {
-
+	//Image attributes
 	this->imageMatrix = map;
 	imgRows = map.rows;
 	imgCols = map.cols;
 
+	//Initial-final nodes
 	this->initialRow = initialRow;
 	this->initialCol = initialCol;
 	this->finalRow =  finalRow;
 	this->finalCol =  finalCol;
 
+	//Map currents
 	indexMap = new IndexMap(imgRows, imgCols);
 
+	//A matrix dimensions
 	cols = 2 * imgRows * imgCols - (imgRows + imgCols); //Incognites number
 	rows = cols;										//Equations number
 
+	//Creation of A x and b
 	A = Matrix<T>(rows, cols, T(0), Matrix<T>::Padded);
 	x_axis = Matrix<T>(imgRows, imgCols, T(0), Matrix<T>::Padded);
 	y_axis = Matrix<T>(imgRows, imgCols, T(0), Matrix<T>::Padded);
 	b = *(new vector<T>(rows));
 
+	//Fill A with equations
 	getNodeEquations();
 	getMeshEquations();
 
+	//Do LU descomposition
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
 
@@ -121,12 +139,10 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	getYAxisMatrix();
 	normalize();
 	getPathPositions(0.1);
-	printMatrixx(x_axis);
-	cout<<endl;
-	printMatrixx(y_axis);
 
+
+	//Plot python graphic for strategy 2
 	plotpy::Plot2d<T> plt;
-
 	plt.initialize(1);
 
 	plt.settitle("Path found");
@@ -140,6 +156,9 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 
 }
 
+/**
+ * @brief This function generate the first nxm equations and fill A with that equation removing one edge equation
+ */
 template <typename T>
 void PathFinder<T>::getNodeEquations()
 {
@@ -195,7 +214,7 @@ void PathFinder<T>::getNodeEquations()
 		}
 	}
 
-
+	//Fill the initial (1A) and final (-1A) of b
 	this->b.at(initialPosition) = 1;
 	this->b.at(finalPosition) = -1;
 
@@ -254,6 +273,10 @@ void PathFinder<T>::getNodeEquations()
 	}
 }
 
+/**
+ * @brief This function place a 1Mohm resistance in occupied nodes and 1ohm resistance to free nodes to
+ * generate the last mesh equations and fill A with that equation 
+ */
 template <typename T>
 void PathFinder<T>::getMeshEquations()
 {
@@ -321,6 +344,10 @@ void PathFinder<T>::getMeshEquations()
 
 }
 
+
+/**
+ * @brief Adds the horizontal currents of each node and places them in an array
+ */
 template<typename T>
 void PathFinder<T>::getXAxisMatrix(){
 			int position;
@@ -346,6 +373,10 @@ void PathFinder<T>::getXAxisMatrix(){
 			}
 }
 
+
+/**
+ * @brief Adds the vertical currents of each node and places them in an array
+ */
 template<typename T>
 void PathFinder<T>::getYAxisMatrix(){
 			int position;
@@ -372,6 +403,9 @@ void PathFinder<T>::getYAxisMatrix(){
 }
 
 
+/**
+ * @brief Normalize the x and y matrix.
+ */
 template<typename T>
 void PathFinder<T>::normalize(){
 	T big, tmp = T(0);
@@ -392,7 +426,11 @@ void PathFinder<T>::normalize(){
 	}
 }
 
-
+/**
+ * @brief This function implements the first strategy to find the first path, following the max
+ * current of each node.
+ * @return points with all the pixels coordinates to draw
+ */
 template <typename T>
 const vector<Point> * PathFinder<T>::getPathPoints()
 {
@@ -409,8 +447,9 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 
 	points->push_back(Point(actualRow,actualCol)); //Initial node
 	
-	
+	//int i = 0;
 	while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
+		//while (i < 60){
 		maxCurrent = 0;
 
 		//Right current
@@ -466,12 +505,18 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		actualRow = nextX;
 		actualCol = nextY;
 		points->push_back(Point(nextX,nextY));
+		std::cout<<"("<<nextX<<","<<nextY<<")"<<std::endl;
 
+		//i++;
 	}//End while
 	return points;
 
 }
 
+/**
+ * @brief Paint the path that is obtained by the vector field.
+ * @param alpha scales the displacement vector.
+*/
 template <typename T>
 void  PathFinder<T>::getPathPositions(T alpha)
 {
@@ -523,6 +568,10 @@ void  PathFinder<T>::getPathPositions(T alpha)
 	}
 }
 
+/**
+ * @brief This function implements the bilinear interpolation to get the value of the function of x and y.
+ * @return the x or y component of the bilinear interpolation 
+*/
 template <typename T>
 T PathFinder<T>::bilinearInterpolation(T q11, T q12, T q21, T q22, T x1, T x2, T y1, T y2, T x, T y) 
 {

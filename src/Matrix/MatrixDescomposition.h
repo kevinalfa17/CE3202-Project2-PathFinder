@@ -11,9 +11,9 @@
 
 #include <iostream>	//Inputs and outputs of text
 #include <cmath>	//Math operations
-#include <limits>
+#include <limits>	//Limits precision
 #include <vector>	//vector 
-#include <stdexcept>
+#include <stdexcept> //Common Exceptions
 
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
@@ -23,16 +23,6 @@
 #include "Matrix.hpp"
 
 using namespace std;
-
-template <typename T>
-void printMatrixx(anpi::Matrix<T> &m){
-	for(int i = 0; i < m.rows(); i++){
-		cout << "|\t";
-		for(int j = 0; j < m.cols(); j++)
-			cout << "[" << m[i][j] << "]\t";
-		cout << "|" <<endl;
-	}
-}
 
 namespace anpi {
 
@@ -183,7 +173,7 @@ void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 		for(i = k+1;i < this->n; i++){
 			tmp = LU[i][k] /= LU[k][k];
 			int var = k+1;
-			if(var%4 != 0){
+			if(var%4 != 0){//Verified if the index can be optimized, if not iterates until it can
 				for(j= k+1; j%4 != 0; j++)
 					LU[i][j] -= tmp*LU[k][j];
 				var = j;
@@ -204,7 +194,7 @@ void MatrixDescomposition<float>::lu(const Matrix<float>& A,
 }
 
 /**
- * @brief Lu decomposition with optimization for float
+ * @brief Lu decomposition with optimization for double
  * @param A
  * @param LU
  */
@@ -242,7 +232,7 @@ void MatrixDescomposition<double>::lu(const Matrix<double>& A,
 				i_max = i;
 			}
 		}
-		if(k != i_max){
+		if(k != i_max){//Optimized pivoting
 			__m128d * zeroArr = (__m128d *) calloc(2,  sizeof(double));
 			double * tmpData = (double*)calloc(LU.dcols(),sizeof(double));
 			memcpy(tmpData,LU[i_max],sizeof(double)*LU.dcols());
@@ -263,7 +253,7 @@ void MatrixDescomposition<double>::lu(const Matrix<double>& A,
 		for(i = k+1;i < this->n; i++){
 			tmp = LU[i][k] /= LU[k][k];
 			int var = k+1;
-			if(var%2 != 0){
+			if(var%2 != 0){//Verifies if the index can be optimized, if not iterates until it can
 				for(j= k+1; j%2 != 0; j++)
 					LU[i][j] -= tmp*LU[k][j];
 				var = j;

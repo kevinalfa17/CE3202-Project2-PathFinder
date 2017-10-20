@@ -10,6 +10,9 @@
 #include <iostream>
 #include "plot/plotpy.h"
 
+/**
+ * @brief Include SIMD library if active
+ */
 #if defined(IS_SIMD_ACTIVE) && defined(IS_SIMD_AVAILABLE)
 #include <xmmintrin.h>
 #endif
@@ -17,6 +20,7 @@
 using namespace std;
 
 /**
+ * @file graficar.cpp
  * @brief Clase utilizada para graficar los resultados del desempeño de las operaciones y descomposición
  * 		  de matrices con y sin SIMD.
  * @author Dennis Porras Barrantes
@@ -35,6 +39,7 @@ int main() {
 	vector<double> tSIM = {1.74e-06, 1.30748e-05, 4.07519e-05, 6.58438e-05, 9.51461e-05, 0.000122872, 0.000196962, 0.000259165, 0.000349906, 0.000409897, 0.00054333, 0.000624611, 0.000761987, 0.000920133, 0.00107344, 0.00122921, 0.00138597, 0.00155163, 0.00173212, 0.00194084, 0.00220079, 0.00239189, 0.00265494, 0.0029346, 0.00312813, 0.00339516, 0.00361511, 0.00426976, 0.00458709, 0.00490925, 0.00528296, 0.00542605, 0.00573005, 0.00614275, 0.00624269, 0.00674843, 0.00700212, 0.00918236, 0.00966442, 0.00871402, 0.0096881, 0.0134647, 0.0133119, 0.0115631, 0.0136708, 0.0153457, 0.0159593, 0.0162853, 0.0148701, 0.0151237, 0.0152895, 0.0158396, 0.0165443, 0.0170638, 0.0181406, 0.0183147, 0.0191841, 0.0198131, 0.0334794, 0.0364083, 0.0368505, 0.0377812, 0.0389521, 0.0401239, 0.0415033, 0.0427135, 0.044136, 0.045401, 0.0472, 0.048544, 0.0503148, 0.0511445, 0.0523349, 0.0540359, 0.0561007, 0.0570783, 0.0580156, 0.0605393, 0.0613031, 0.062524, 0.064625, 0.0656317, 0.0678385, 0.06884, 0.0704032, 0.0727353, 0.0751002, 0.0756277, 0.0771964, 0.0799363, 0.0797335, 0.0846311, 0.0884245, 0.0873577, 0.0942746, 0.0903949, 0.0934712, 0.0958555, 0.0980399, 0.098586, 0.100036 };
 
 
+	//Grafico de la suma
 	plt.initialize(1);
 	plt.settitle("ADD OPERATION PERFORMANCE");
 	plt.setxlabel("DIMENTION");
@@ -47,6 +52,7 @@ int main() {
 	vector<double> dimens = {12,31,82,237,6583};
 	vector<double> luSIM = {4.6e-05,0.000194,0.001536,0.03095,360.087};
 
+	//Grafico de la descomposicion lu
 	plt2.initialize(2);
 	plt2.settitle("LU DESCOMPOSITION PERFORMANCE");
 	plt2.setxlabel("DIMENTION");

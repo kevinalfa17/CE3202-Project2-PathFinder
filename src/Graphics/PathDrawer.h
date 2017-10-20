@@ -1,8 +1,9 @@
 /*
- * NodePair.h
- *
+ *  PathDrawer.h
+ *  This class is used to draw pixels on screen
+ * 
  *  Created on: 18 de oct. de 2017
- *      Author: kevin
+ *  Author: Kevin
  */
 
 #ifndef PATHDRAWER_H_
@@ -20,18 +21,27 @@ private:
     Mat imageMatrix;
 };
 
+
+/**
+ * @brief Constructor by default
+ * @param mat Image to draw path
+ */
 PathDrawer::PathDrawer(Mat mat){
 
     cvtColor( mat, this->imageMatrix, CV_GRAY2RGB);
 }
 
+/**
+ * @brief Method that draws a previously calculated path over an image
+ * @param points vector of points to draw
+ */
 void PathDrawer::drawPath(const vector<Point> * points){
     Vec3b redLine(0,0,255);
     for (int i=0; i < points->size(); i++){
         this->imageMatrix.at<Vec3b>(points->at(i).x,points->at(i).y) = redLine;        
     }
 
-    namedWindow( "PathFinder Strategy 1", WINDOW_AUTOSIZE );
+    namedWindow( "PathFinder Strategy 1", WINDOW_NORMAL );
     imshow( "PathFinder Strategy 1", this->imageMatrix );                   
 
     waitKey(0); 
