@@ -133,6 +133,7 @@ PathFinder<T>::PathFinder(int initialRow, int initialCol, int finalRow, int fina
 	MatrixDescomposition<T> *solver = new MatrixDescomposition<T>();
 	solver->solveLU(A, x, b);
 
+	
 	getXAxisMatrix();
 	getYAxisMatrix();
 	normalize();
@@ -185,10 +186,11 @@ void PathFinder<T>::getNodeEquations()
 		finalPosition = (finalCol - 1) + this->imgCols * this->finalRow;
 	}
 	//Check if 0,cols-1 edge is free (Upper right)
-	else if (!(initialRow == 0 && this-> initialCol == this->imgCols - 1) && !(finalRow == 0 && this->finalCol == this->imgCols - 1))
+	else if (!(initialRow == 0 && this->initialCol == this->imgCols - 1) && !(finalRow == 0 && this->finalCol == this->imgCols - 1))
 	{
+
 		flag = 1;
-		if (!(initialRow == 0 && this-> initialCol < this->imgCols - 1 ))
+		if (!(initialRow == 0 && this->initialCol < this->imgCols - 1 ))
 		{
 			//Input current
 			initialPosition = (initialCol - 1) + this->imgCols *this-> initialRow;
@@ -215,10 +217,10 @@ void PathFinder<T>::getNodeEquations()
 		}
 	}
 
+	
 	//Fill the initial (1A) and final (-1A) of b
 	this->b.at(initialPosition) = 1;
 	this->b.at(finalPosition) = -1;
-
 
 	for (int i = 0; i < this->imgRows; i++)
 	{
@@ -437,9 +439,9 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 
 	points->push_back(Point(actualRow,actualCol)); //Initial node
 	
-	//int i = 0;
-	while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
-		//while (i < 60){
+	int i = 0;
+	//while(!(actualRow == this->finalRow && actualCol == this->finalCol)){
+		while (i < 90){
 		maxCurrent = 0;
 
 		//Right current
@@ -447,7 +449,7 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		{	
 			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow, actualCol  + 1);			
 			nextCurrent = abs(solutions.at(position));
-			if(nextCurrent > maxCurrent ){
+			if(nextCurrent > maxCurrent && solutions.at(position) < 0){
 				maxCurrent = nextCurrent;
 				nextX = actualRow;
 				nextY = actualCol + 1;
@@ -460,7 +462,7 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		{
 			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow + 1, actualCol );
 			nextCurrent = abs(solutions.at(position));
-			if(nextCurrent > maxCurrent ){
+			if(nextCurrent > maxCurrent && solutions.at(position) < 0){
 				maxCurrent = nextCurrent;
 				nextX = actualRow + 1;
 				nextY = actualCol;
@@ -472,7 +474,7 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		{
 			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow, actualCol  - 1);
 			nextCurrent = abs(solutions.at(position));
-			if(nextCurrent > maxCurrent ){
+			if(nextCurrent > maxCurrent && solutions.at(position) > 0){
 				maxCurrent = nextCurrent;
 				nextX = actualRow;
 				nextY = actualCol - 1;
@@ -484,7 +486,7 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		{
 			position = indexMap->getXFromNodes(actualRow, actualCol , actualRow - 1, actualCol);
 			nextCurrent = abs(solutions.at(position));
-			if(nextCurrent > maxCurrent ){
+			if(nextCurrent > maxCurrent && solutions.at(position) > 0){
 				maxCurrent = nextCurrent;
 				nextX = actualRow - 1;
 				nextY = actualCol;
@@ -495,9 +497,9 @@ const vector<Point> * PathFinder<T>::getPathPoints()
 		actualRow = nextX;
 		actualCol = nextY;
 		points->push_back(Point(nextX,nextY));
-		std::cout<<"("<<nextX<<","<<nextY<<")"<<std::endl;
+	
 
-		//i++;
+		i++;
 	}//End while
 	return points;
 
